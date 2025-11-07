@@ -85,7 +85,7 @@ if [ -z "$IID" ] || [ "$IID" = "None" ]; then
   say "Launching EC2 ${EC2_TYPE} with SSM role"
   SUBNET_ID="$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --query "Subnets[0].SubnetId" --output text)"
   PROFILE_ARN="$(aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" --query "InstanceProfile.Arn" --output text)"
-  USERDATA=$(base64 -w0 <<'UD'
+  USERDATA=$(cat <<'UD' | base64 | tr -d '\n'
 #!/bin/bash
 set -e
 dnf install -y docker
