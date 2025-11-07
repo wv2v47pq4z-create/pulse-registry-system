@@ -13,3 +13,7 @@ states/
 # Optional
 .env
 .env.local
+
+# System files
+*.log
+.DS_Store
