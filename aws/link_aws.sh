@@ -53,7 +53,8 @@ SG_ID="$(aws ec2 describe-security-groups --filters "Name=group-name,Values=${SG
 if [ -z "$SG_ID" ] || [ "$SG_ID" = "None" ]; then
   say "Creating Security Group ${SG_NAME} in ${VPC_ID}"
   SG_ID="$(aws ec2 create-security-group --group-name "$SG_NAME" --description "SuperRealityOS egress-only" --vpc-id "$VPC_ID" --query GroupId --output text)"
-  aws ec2 revoke-security-group-egress --group-id "$SG_ID" --ip-permissions "[]" >/dev/null 2>&1 || true
+  # Revoke default egress rule (best effort - may fail on some AWS accounts)
+  aws ec2 revoke-security-group-egress --group-id "$SG_ID" --protocol all --port all --cidr 0.0.0.0/0 >/dev/null 2>&1 || true
   aws ec2 authorize-security-group-egress --group-id "$SG_ID" --ip-permissions '[{"IpProtocol":"-1","IpRanges":[{"CidrIp":"0.0.0.0/0"}]}]'
 else say "Security Group exists: ${SG_NAME} (${SG_ID})"; fi
 
@@ -64,13 +65,24 @@ if [ -z "$IID" ] || [ "$IID" = "None" ]; then
   say "Launching EC2 ${EC2_TYPE} with SSM role"
   SUBNET_ID="$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --query "Subnets[0].SubnetId" --output text)"
   PROFILE_ARN="$(aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" --query "InstanceProfile.Arn" --output text)"
-  USERDATA=$(base64 -w0 <<'UD'
+  # Encode userdata (use -w0 for GNU base64, fallback to standard base64)
+  if base64 -w0 </dev/null >/dev/null 2>&1; then
+    USERDATA=$(base64 -w0 <<'UD'
 #!/bin/bash
 set -e
 dnf install -y docker
 systemctl enable docker --now
 UD
 )
+  else
+    USERDATA=$(base64 <<'UD'
+#!/bin/bash
+set -e
+dnf install -y docker
+systemctl enable docker --now
+UD
+)
+  fi
   IID="$(aws ec2 run-instances --image-id "$AMI_ID" --instance-type "$EC2_TYPE" --iam-instance-profile Arn="$PROFILE_ARN" --security-group-ids "$SG_ID" --subnet-id "$SUBNET_ID" --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${NAME_TAG}},{Key=System,Value=SuperRealityOS},{Key=Component,Value=CloudRoutes},{Key=Owner,Value=AlexLeBrun}]" --user-data "$USERDATA" --query "Instances[0].InstanceId" --output text)"
   say "Instance launched: ${IID}"
 else say "EC2 instance already present: ${IID}"; fi
