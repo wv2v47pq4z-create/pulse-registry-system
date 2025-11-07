@@ -114,17 +114,17 @@ aws ssm describe-instance-information --max-results 10 --query "InstanceInformat
 Region: $Region
 
 ## CloudShell (recommended)
-``````bash
+```bash
 REGION=$Region
 curl -fsSL https://raw.githubusercontent.com/$GhUser/$RepoName/main/aws/link_aws.sh -o link_aws.sh && \
 chmod +x link_aws.sh && ./link_aws.sh
-``````
+```
 
 ## Local (if AWS CLI is authenticated)
-``````bash
+```bash
 chmod +x aws/link_aws.sh
 ./aws/link_aws.sh
-``````
+```
 
 Creates: S3 (versioned, encrypted), ECR, IAM Role+Profile, egress-only SG, EC2 t3.large (SSM-managed).
 Tags: System=SuperRealityOS, Component=CloudRoutes, Owner=AlexLeBrun
