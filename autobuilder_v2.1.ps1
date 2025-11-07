@@ -168,11 +168,18 @@ OUTPUT: concise steps + exact commands.
 # Git push (idempotent)
 if (!(Test-Path ".git")) { git init | Out-Null }
 git add .
-try { git commit -m "Super Reality OS — CloudRoutes AWS Link v1" } catch { }
+try { 
+    git commit -m "Super Reality OS — CloudRoutes AWS Link v1" 
+} catch { 
+    Write-Host "No changes to commit (repository may already exist)"
+}
 git branch -M main 2>$null | Out-Null
 $RemoteUrl = "https://github.com/$GhUser/$RepoName.git"
 git remote add origin $RemoteUrl 2>$null | Out-Null
-try { gh repo view "$GhUser/$RepoName" | Out-Null } catch { gh repo create $RepoName --public --source=. --remote=origin --push | Out-Null }
+$repoExists = gh repo view "$GhUser/$RepoName" 2>&1
+if ($LASTEXITCODE -ne 0) {
+    gh repo create $RepoName --public --source=. --remote=origin --push | Out-Null
+}
 git push -u origin main
 
 # Open CloudShell + put command on clipboard
