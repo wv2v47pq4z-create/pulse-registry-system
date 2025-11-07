@@ -103,9 +103,9 @@ if ! aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" >/dev/
 else say "Instance Profile exists: ${PROFILE_NAME}"; fi
 
 # SG (egress-only)
-VPC_ID="$(aws ec2 describe-vpcs --query "Vpcs[?IsDefault==\`true\`].VpcId" --output text)"; [ -z "$VPC_ID" -o "$VPC_ID" = "None" ] && VPC_ID="$(aws ec2 describe-vpcs --query "Vpcs[0].VpcId" --output text)"
+VPC_ID="$(aws ec2 describe-vpcs --query "Vpcs[?IsDefault==\`true\`].VpcId" --output text)"; if [ -z "$VPC_ID" ] || [ "$VPC_ID" = "None" ]; then VPC_ID="$(aws ec2 describe-vpcs --query "Vpcs[0].VpcId" --output text)"; fi
 SG_ID="$(aws ec2 describe-security-groups --filters "Name=group-name,Values=${SG_NAME}" "Name=vpc-id,Values=${VPC_ID}" --query "SecurityGroups[0].GroupId" --output text 2>/dev/null || true)"
-if [ -z "$SG_ID" -o "$SG_ID" = "None" ]; then
+if [ -z "$SG_ID" ] || [ "$SG_ID" = "None" ]; then
   say "Creating Security Group ${SG_NAME} in ${VPC_ID}"
   SG_ID="$(aws ec2 create-security-group --group-name "$SG_NAME" --description "SuperRealityOS egress-only" --vpc-id "$VPC_ID" --query GroupId --output text)"
   aws ec2 revoke-security-group-egress --group-id "$SG_ID" --ip-permissions "[]" >/dev/null 2>&1 || true
@@ -115,7 +115,7 @@ else say "Security Group exists: ${SG_NAME} (${SG_ID})"; fi
 # EC2 (SSM-managed; no SSH)
 AMI_ID="$(aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 --query "Parameters[0].Value" --output text)"
 IID="$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${NAME_TAG}" "Name=instance-state-name,Values=pending,running,stopped" --query "Reservations[].Instances[0].InstanceId" --output text 2>/dev/null || true)"
-if [ -z "$IID" -o "$IID" = "None" ]; then
+if [ -z "$IID" ] || [ "$IID" = "None" ]; then
   say "Launching EC2 ${EC2_TYPE} with SSM role"
   SUBNET_ID="$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --query "Subnets[0].SubnetId" --output text)"
   PROFILE_ARN="$(aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" --query "InstanceProfile.Arn" --output text)"
