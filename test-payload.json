@@ -1,0 +1,12 @@
+{
+  "videoUrl": "https://example.com/videos/epic-gaming-moment.mp4",
+  "topic": "Epic Gaming Comeback Victory",
+  "tone": "hype",
+  "platforms": ["tiktok"],
+  "batchId": "batch-2024-001",
+  "extra": {
+    "tags": ["gaming", "victory", "clutch"],
+    "duration": 45,
+    "resolution": "1080x1920"
+  }
+}

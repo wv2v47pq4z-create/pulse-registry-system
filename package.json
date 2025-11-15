@@ -1,31 +1,38 @@
 {
-  "name": "pulse-registry-system",
-  "version": "1.0.0",
-  "description": "Smart contracts for PulseRegistry and ZcashBridge - auto-registration and interoperability layer for Super Reality Studios blockchain ecosystem",
-  "main": "executor/index.js",
+  "name": "sr-os-autopost-engine",
+  "version": "2.0.0",
+  "description": "SR-OS AutoPost Engine - Social media automation system for TikTok, Instagram, and YouTube",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node executor/index.js",
-    "deploy": "node scripts/deploy.js",
-    "monitor": "node scripts/monitor.js",
-    "test": "echo \"No tests specified yet\" && exit 0"
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop sr-os-autopost-engine",
+    "pm2:logs": "pm2 logs sr-os-autopost-engine",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
   },
   "keywords": [
-    "blockchain",
-    "smart-contracts",
-    "pulse",
-    "zcash",
-    "bridge",
-    "executor"
+    "autopost",
+    "social-media",
+    "tiktok",
+    "instagram",
+    "youtube",
+    "sr-os"
   ],
   "author": "Super Reality Studios",
   "license": "MIT",
   "dependencies": {
-    "web3": "^4.3.0",
-    "ethers": "^6.9.0",
+    "express": "^4.18.2",
     "dotenv": "^16.3.1",
     "axios": "^1.6.2"
   },
   "devDependencies": {
-    "solc": "^0.8.21"
+    "pm2": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
