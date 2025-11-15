@@ -1,0 +1,31 @@
+{
+  "name": "pulse-registry-system",
+  "version": "1.0.0",
+  "description": "Smart contracts for PulseRegistry and ZcashBridge - auto-registration and interoperability layer for Super Reality Studios blockchain ecosystem",
+  "main": "executor/index.js",
+  "scripts": {
+    "start": "node executor/index.js",
+    "deploy": "node scripts/deploy.js",
+    "monitor": "node scripts/monitor.js",
+    "test": "echo \"No tests specified yet\" && exit 0"
+  },
+  "keywords": [
+    "blockchain",
+    "smart-contracts",
+    "pulse",
+    "zcash",
+    "bridge",
+    "executor"
+  ],
+  "author": "Super Reality Studios",
+  "license": "MIT",
+  "dependencies": {
+    "web3": "^4.3.0",
+    "ethers": "^6.9.0",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "solc": "^0.8.21"
+  }
+}
