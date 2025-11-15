@@ -13,3 +13,11 @@ states/
 # Optional
 .env
 .env.local
+# SR-OS AutoPost Engine
+node_modules/
+logs/*.log
+.env
+posted/*
+!posted/.gitkeep
+*.bak
+pm2-*.log
