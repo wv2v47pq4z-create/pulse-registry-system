@@ -1,0 +1,29 @@
+[Unit]
+Description=SR-OS AutoPost Remote Executor Node
+Documentation=https://github.com/wv2v47pq4z-create/pulse-registry-system
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=autopost
+Group=autopost
+WorkingDirectory=/opt/pulse-registry-system
+ExecStart=/usr/bin/python3 /opt/pulse-registry-system/autopost_client.py run
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sr-autopost
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/pulse-registry-system/logs /opt/pulse-registry-system/posted_files.json
+
+# Restart policy
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
