@@ -1,207 +1,398 @@
-# Pulse Registry System
+# SR-OS AutoPost Engine
 
-Smart contracts for PulseRegistry and ZcashBridge - auto-registration and interoperability layer for Super Reality Studios blockchain ecosystem.
+Production-ready social media automation system for TikTok, Instagram, and YouTube Shorts with automated caption and hashtag generation.
 
 ## Overview
 
-The Pulse Registry System is a comprehensive blockchain solution that provides:
-
-- **PulseRegistry**: A decentralized registry for managing nodes and entities in the network
-- **ZcashBridge**: Cross-chain bridge for interoperability with Zcash blockchain
-- **AutoPostExecutor**: Automated task scheduling and execution system
-- **SR-OS Remote Executor Node**: A Node.js service that monitors and executes scheduled tasks
+The SR-OS AutoPost Engine is an Express.js-based service that automatically generates platform-optimized captions and hashtags for social media content. It provides a REST API for processing video upload requests and generating ready-to-post content artifacts.
 
 ## Features
 
-### Smart Contracts
-
-1. **PulseRegistry** (`contracts/PulseRegistry.sol`)
-   - Node registration and management
-   - Endpoint tracking
-   - Active/inactive status management
-   - Owner-based access control
-
-2. **ZcashBridge** (`contracts/ZcashBridge.sol`)
-   - Cross-chain asset bridging
-   - Transaction status tracking
-   - Operator management
-   - Configurable bridge fees
-   - Automatic refunds for failed transactions
-
-3. **AutoPostExecutor** (`contracts/AutoPostExecutor.sol`)
-   - Scheduled task execution
-   - Batch processing support
-   - Configurable gas limits
-   - Task status tracking
-   - Security delay mechanisms
-
-### Executor Node
-
-The SR-OS AutoPost Remote Executor Node (`executor/index.js`) is a Node.js service that:
-- Automatically monitors for pending tasks
-- Executes tasks at their scheduled time
-- Processes bridge transactions
-- Self-registers in the PulseRegistry
-- Handles graceful shutdown
+- **Platform-Specific Content Generation**: Tailored captions and hashtags for TikTok, Instagram, and YouTube
+- **Tone-Aware Content**: Supports multiple tones (hype, chill, educational, cinematic, raw, default)
+- **Smart Hashtag Generation**: Platform-optimized hashtag counts and keyword extraction
+- **Machine-Usable Output**: Returns structured JSON with artifacts, HTTP requests, and curl examples
+- **Production-Ready**: Docker support, PM2 clustering, health checks, and logging
 
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js v16 or higher
-- npm or yarn
-- Access to an Ethereum-compatible blockchain network
+- npm or yarn (for local development)
+- Docker & Docker Compose (for containerized deployment)
 
-### Installation
+### Local Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/wv2v47pq4z-create/pulse-registry-system
-cd pulse-registry-system
-
 # Install dependencies
 npm install
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your configuration
+# Start the server
+npm run dev
 ```
 
-### Deployment
+The server will start on port 8181.
+
+### Test the Service
 
 ```bash
-# Deploy contracts to your network
-npm run deploy
+# Health check
+curl http://localhost:8181/status
+
+# Test AutoPost endpoint with TikTok
+curl -X POST http://localhost:8181/sr-autopost/tiktok \
+  -H "Content-Type: application/json" \
+  -d '{
+    "videoUrl": "https://example.com/video.mp4",
+    "topic": "Amazing Dance Moves"
+  }'
+
+# Test with custom payload
+curl -X POST http://localhost:8181/sr-autopost/tiktok \
+  -H "Content-Type: application/json" \
+  -d @test-payload.json
 ```
 
-This will compile and deploy all contracts, then save the deployment information to:
-- `config/deployments.json` - Full deployment data with ABIs
-- `.env.deployed` - Environment variables for easy configuration
+## Docker Usage
 
-### Running the Executor Node
+### Build and Run with Docker Compose
 
 ```bash
-# Update your .env with deployed contract addresses
-cat .env.deployed >> .env
+# Build the image
+npm run docker:build
+# or
+docker-compose build
 
-# Start the executor node
-npm start
+# Start the service
+npm run docker:up
+# or
+docker-compose up -d
+
+# View logs
+npm run docker:logs
+# or
+docker-compose logs -f
+
+# Stop the service
+npm run docker:down
+# or
+docker-compose down
 ```
 
-## Documentation
+### Manual Docker Commands
 
-- [Setup Guide](SETUP.md) - Detailed installation and configuration instructions
-- [API Documentation](API.md) - Complete API reference for all contracts and services
-- [Configuration](config/README.md) - Configuration file details
+```bash
+# Build the image
+docker build -t sr-os-autopost-engine .
+
+# Run the container
+docker run -d \
+  -p 8181:8181 \
+  -v $(pwd)/logs:/app/logs \
+  -v $(pwd)/posted:/app/posted \
+  --name autopost \
+  sr-os-autopost-engine
+
+# View logs
+docker logs -f autopost
+
+# Stop and remove
+docker stop autopost && docker rm autopost
+```
+
+## PM2 Production Deployment
+
+For production deployments with process management:
+
+```bash
+# Start with PM2
+npm run pm2:start
+
+# View logs
+npm run pm2:logs
+
+# Stop the service
+npm run pm2:stop
+```
+
+PM2 will run the service in cluster mode with automatic restarts and load balancing.
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `8181` |
+| `NODE_ENV` | Environment (development/production) | `development` |
+| `AUTOPOST_WEBHOOK_URL` | Target webhook URL | `https://autopost.superreality.studio/webhook/auto-post` |
+| `POSTED_FOLDER` | Folder for posted content | `./posted` |
+| `LOGS_FOLDER` | Folder for log files | `./logs` |
+| `OPENAI_API_KEY` | Optional OpenAI API key | - |
+| `ANTHROPIC_API_KEY` | Optional Anthropic API key | - |
+
+## API Documentation
+
+### Endpoints
+
+#### Health Check
+```
+GET /status
+```
+
+Returns service status and version information.
+
+#### AutoPost Endpoints
+
+##### TikTok
+```
+POST /sr-autopost/tiktok
+```
+
+##### Instagram
+```
+POST /sr-autopost/instagram
+```
+
+##### YouTube
+```
+POST /sr-autopost/youtube
+```
+
+##### Multi-Platform
+```
+POST /sr-autopost
+```
+
+### Request Schema
+
+All AutoPost endpoints accept the following JSON payload:
+
+```json
+{
+  "videoUrl": "string (required)",
+  "topic": "string (required)",
+  "tone": "hype | chill | educational | cinematic | raw | default (optional, default: hype)",
+  "platforms": ["tiktok", "instagram", "youtube"] (optional, default: ["tiktok"]),
+  "batchId": "string (optional)",
+  "extra": {} (optional)
+}
+```
+
+### Response Schema
+
+The service returns a machine-usable JSON response:
+
+```json
+{
+  "status": "success",
+  "topic": "Your Video Topic",
+  "tone": "hype",
+  "platforms": ["tiktok"],
+  "batchId": null,
+  "artifacts": [
+    {
+      "platform": "tiktok",
+      "videoUrl": "https://example.com/video.mp4",
+      "caption": "Generated caption...",
+      "hashtags": ["#fyp", "#viral", ...],
+      "hashtagString": "#fyp #viral ...",
+      "fullCaption": "Caption with hashtags..."
+    }
+  ],
+  "httpRequests": [
+    {
+      "method": "POST",
+      "url": "https://autopost.superreality.studio/webhook/auto-post",
+      "headers": {...},
+      "body": {...}
+    }
+  ],
+  "curlExamples": [
+    {
+      "platform": "tiktok",
+      "curl": "curl -X POST ..."
+    }
+  ],
+  "summary": {
+    "totalPlatforms": 1,
+    "generatedAt": "2025-11-15T...",
+    "webhookUrl": "https://autopost.superreality.studio/webhook/auto-post"
+  }
+}
+```
+
+## Platform-Specific Rules
+
+### TikTok
+- Short hook (3-6 words)
+- 2-3 lines of caption
+- 6-12 hashtags
+- Trending and engagement-focused
+
+### Instagram Reels
+- 1-2 sentences
+- 8-15 hashtags
+- Broader reach strategy
+- Engagement prompts
+
+### YouTube Shorts
+- Title ≤45 characters
+- 1-3 line description
+- 4-7 hashtags (minimal per YouTube best practices)
+- Optimized for Shorts format
+
+## Tone Styles
+
+- **hype**: ALL CAPS, high energy, excitement
+- **chill**: lowercase, relaxed, peaceful vibes
+- **educational**: Clear, informative, structured
+- **cinematic**: Artistic, dramatic, storytelling
+- **raw**: Authentic, unfiltered, direct
+- **default**: Balanced, neutral, standard
 
 ## Project Structure
 
 ```
-pulse-registry-system/
-├── contracts/              # Solidity smart contracts
-│   ├── PulseRegistry.sol
-│   ├── ZcashBridge.sol
-│   └── AutoPostExecutor.sol
-├── executor/               # Executor node service
-│   └── index.js
-├── scripts/                # Deployment and utility scripts
-│   └── deploy.js
-├── config/                 # Configuration files
-│   └── deployments.json   # Generated after deployment
-├── tests/                  # Test files (future)
-├── .env.example            # Environment variable template
-├── package.json            # Node.js dependencies and scripts
-├── SETUP.md               # Setup guide
-├── API.md                 # API documentation
-└── README.md              # This file
+sr-os-autopost-engine/
+├── src/
+│   ├── server.js              # Main Express server
+│   ├── routes/
+│   │   └── autopost.js        # AutoPost route handlers
+│   ├── services/
+│   │   ├── validation.js      # Schema validation
+│   │   ├── captionGenerator.js # Caption generation
+│   │   ├── hashtagGenerator.js # Hashtag generation
+│   │   └── uploadRouter.js    # Upload routing
+│   ├── utils/
+│   │   ├── logger.js          # Logging utility
+│   │   └── env.js             # Environment config
+│   └── watchers/
+│       └── postedFolderWatcher.js # Folder monitoring
+├── logs/                      # Application logs
+│   ├── access.log
+│   └── autopost-events.log
+├── posted/                    # Posted content folder
+├── package.json               # Node.js configuration
+├── .env.example               # Environment template
+├── Dockerfile                 # Docker configuration
+├── docker-compose.yml         # Docker Compose setup
+├── ecosystem.config.js        # PM2 configuration
+└── test-payload.json          # Example test payload
 ```
 
-## Usage Examples
+## Example Payloads
 
-### Creating an Automated Task
-
-```javascript
-const { ethers } = require('ethers');
-
-// Create a task that executes in 1 hour
-const autoPostExecutor = new ethers.Contract(address, abi, wallet);
-
-const callData = contractInterface.encodeFunctionData('myFunction', [param1, param2]);
-const executionTime = Math.floor(Date.now() / 1000) + 3600;
-
-const tx = await autoPostExecutor.createTask(
-    targetContract,
-    callData,
-    executionTime,
-    300000,
-    "Execute myFunction"
-);
-
-await tx.wait();
+### Basic TikTok Request
+```json
+{
+  "videoUrl": "https://example.com/dance.mp4",
+  "topic": "Amazing Dance Moves"
+}
 ```
 
-### Registering a Node
-
-```javascript
-const pulseRegistry = new ethers.Contract(address, abi, wallet);
-
-const tx = await pulseRegistry.registerNode(
-    "my-node-id",
-    "http://my-node.example.com:3000"
-);
-
-await tx.wait();
+### Educational YouTube Short
+```json
+{
+  "videoUrl": "https://example.com/tutorial.mp4",
+  "topic": "Quick Photography Tips",
+  "tone": "educational",
+  "platforms": ["youtube"]
+}
 ```
 
-### Bridging to Zcash
-
-```javascript
-const zcashBridge = new ethers.Contract(address, abi, wallet);
-
-const tx = await zcashBridge.initiateBridge(
-    "z1abc123...",
-    { value: ethers.parseEther("1.0") }
-);
-
-await tx.wait();
+### Multi-Platform Hype Content
+```json
+{
+  "videoUrl": "https://example.com/epic.mp4",
+  "topic": "Epic Gaming Comeback Victory",
+  "tone": "hype",
+  "platforms": ["tiktok", "instagram", "youtube"],
+  "batchId": "batch-2024-001"
+}
 ```
+
+## Logging
+
+The service logs to two files:
+- `logs/access.log` - HTTP access logs
+- `logs/autopost-events.log` - Application events and errors
+
+Logs include timestamps, log levels, and structured metadata.
+
+## Health Checks
+
+The `/status` endpoint provides:
+- Service status
+- Version information
+- Timestamp
+
+Docker Compose includes automatic health checks using this endpoint.
+
+## Security
+
+- Runs as non-root user in Docker
+- Input validation on all requests
+- Configurable via environment variables
+- No secrets in code or logs
 
 ## Development
 
-### Building
-
-Contracts are compiled automatically during deployment using the solc compiler.
-
-### Testing
-
+### Install Dependencies
 ```bash
-npm test
+npm install
 ```
 
-## Security Considerations
+### Run Development Server
+```bash
+npm run dev
+```
 
-- Store private keys securely and never commit them to version control
-- Use `.env` files and add them to `.gitignore`
-- Only authorize trusted addresses as executors and operators
-- Set appropriate gas limits for automated tasks
-- Test thoroughly on testnets before mainnet deployment
-- Monitor executor node health and transaction status
+### Available Scripts
+- `npm start` - Start the server
+- `npm run dev` - Start in development mode
+- `npm run pm2:start` - Start with PM2
+- `npm run pm2:stop` - Stop PM2 service
+- `npm run pm2:logs` - View PM2 logs
+- `npm run docker:build` - Build Docker image
+- `npm run docker:up` - Start Docker container
+- `npm run docker:down` - Stop Docker container
+- `npm run docker:logs` - View Docker logs
 
-## Contributing
+## Troubleshooting
 
-Contributions are welcome! Please feel free to submit issues and pull requests.
+### Port Already in Use
+Change the `PORT` in `.env` or set it when running:
+```bash
+PORT=8182 npm start
+```
+
+### Dependencies Not Installing
+Clear npm cache and reinstall:
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Docker Build Issues
+Clean Docker cache:
+```bash
+docker-compose down -v
+docker system prune -a
+npm run docker:build
+```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
 For questions and support:
 - Open an issue in this repository
-- Check the [Setup Guide](SETUP.md) for common issues
-- Review the [API Documentation](API.md) for usage details
+- Check the example payloads in `test-payload.json`
 
 ## Acknowledgments
 
-Developed for Super Reality Studios blockchain ecosystem.
+Developed by Super Reality Studios for the SR-OS ecosystem.
