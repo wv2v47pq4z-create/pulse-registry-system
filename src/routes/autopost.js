@@ -6,34 +6,69 @@
 const express = require('express');
 const { logger } = require('../utils/logger');
 const { validateAutoPostPayload } = require('../services/validation');
+const { routeUpload } = require('../services/uploadRouter');
 
 const router = express.Router();
+
+/**
+ * Process AutoPost request for any platform
+ * @param {Object} req - Express request
+ * @param {Object} res - Express response
+ * @param {string} defaultPlatform - Default platform if not specified
+ */
+async function processAutoPostRequest(req, res, defaultPlatform) {
+    try {
+        logger.info(`Received ${defaultPlatform} AutoPost request`, { 
+            body: req.body,
+            timestamp: new Date().toISOString()
+        });
+
+        // Ensure the request payload includes the correct platform
+        const requestPayload = {
+            ...req.body,
+            platforms: req.body.platforms || [defaultPlatform]
+        };
+
+        // Validate payload
+        const validatedPayload = validateAutoPostPayload(requestPayload);
+        
+        logger.info('Payload validated', { 
+            topic: validatedPayload.topic,
+            tone: validatedPayload.tone,
+            platforms: validatedPayload.platforms
+        });
+        
+        // Route upload and generate artifacts
+        const uploadResponse = routeUpload(validatedPayload);
+        
+        logger.info('AutoPost processing complete', {
+            topic: validatedPayload.topic,
+            platforms: validatedPayload.platforms.length
+        });
+        
+        // Return machine-usable JSON response
+        res.json(uploadResponse);
+        
+    } catch (error) {
+        logger.error(`${defaultPlatform} AutoPost error:`, {
+            message: error.message,
+            stack: error.stack
+        });
+        
+        res.status(400).json({
+            status: 'error',
+            message: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+}
 
 /**
  * TikTok AutoPost endpoint
  * POST /sr-autopost/tiktok
  */
 router.post('/tiktok', async (req, res) => {
-    try {
-        logger.info('Received TikTok AutoPost request', { body: req.body });
-
-        // Validate payload
-        const validatedPayload = validateAutoPostPayload(req.body);
-        
-        // TODO: Phase 2 - Implement caption, hashtag generation and upload routing
-        
-        res.json({
-            status: 'success',
-            message: 'AutoPost request received and validated',
-            payload: validatedPayload
-        });
-    } catch (error) {
-        logger.error('TikTok AutoPost error:', error);
-        res.status(400).json({
-            status: 'error',
-            message: error.message
-        });
-    }
+    await processAutoPostRequest(req, res, 'tiktok');
 });
 
 /**
@@ -41,23 +76,7 @@ router.post('/tiktok', async (req, res) => {
  * POST /sr-autopost/instagram
  */
 router.post('/instagram', async (req, res) => {
-    try {
-        logger.info('Received Instagram AutoPost request', { body: req.body });
-
-        const validatedPayload = validateAutoPostPayload(req.body);
-        
-        res.json({
-            status: 'success',
-            message: 'AutoPost request received and validated',
-            payload: validatedPayload
-        });
-    } catch (error) {
-        logger.error('Instagram AutoPost error:', error);
-        res.status(400).json({
-            status: 'error',
-            message: error.message
-        });
-    }
+    await processAutoPostRequest(req, res, 'instagram');
 });
 
 /**
@@ -65,21 +84,50 @@ router.post('/instagram', async (req, res) => {
  * POST /sr-autopost/youtube
  */
 router.post('/youtube', async (req, res) => {
-    try {
-        logger.info('Received YouTube AutoPost request', { body: req.body });
+    await processAutoPostRequest(req, res, 'youtube');
+});
 
+/**
+ * Generic AutoPost endpoint (supports multiple platforms)
+ * POST /sr-autopost
+ */
+router.post('/', async (req, res) => {
+    try {
+        logger.info('Received generic AutoPost request', { 
+            body: req.body,
+            timestamp: new Date().toISOString()
+        });
+
+        // Validate payload
         const validatedPayload = validateAutoPostPayload(req.body);
         
-        res.json({
-            status: 'success',
-            message: 'AutoPost request received and validated',
-            payload: validatedPayload
+        logger.info('Payload validated', { 
+            topic: validatedPayload.topic,
+            tone: validatedPayload.tone,
+            platforms: validatedPayload.platforms
         });
+        
+        // Route upload and generate artifacts for all platforms
+        const uploadResponse = routeUpload(validatedPayload);
+        
+        logger.info('AutoPost processing complete', {
+            topic: validatedPayload.topic,
+            platforms: validatedPayload.platforms.length
+        });
+        
+        // Return machine-usable JSON response
+        res.json(uploadResponse);
+        
     } catch (error) {
-        logger.error('YouTube AutoPost error:', error);
+        logger.error('Generic AutoPost error:', {
+            message: error.message,
+            stack: error.stack
+        });
+        
         res.status(400).json({
             status: 'error',
-            message: error.message
+            message: error.message,
+            timestamp: new Date().toISOString()
         });
     }
 });
