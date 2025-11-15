@@ -40,6 +40,7 @@ class AutoPostClient:
     
     def __init__(self, config_path: str = "config.json"):
         self.config_path = config_path
+        self.config = None  # Initialize to None first
         self.config = self._load_config()
         self.posted_files_path = Path("posted_files.json")
         self.posted_files = self._load_posted_files()
@@ -108,8 +109,8 @@ class AutoPostClient:
         console_msg = f"[{timestamp}] {level}: {message}"
         print(console_msg)
         
-        # JSONL file output
-        if self.config.get("enable_logging", True):
+        # JSONL file output (only if config is loaded)
+        if self.config and self.config.get("enable_logging", True):
             log_file = Path(self.config.get("log_file", "./logs/autopost_status.jsonl"))
             log_file.parent.mkdir(parents=True, exist_ok=True)
             
@@ -139,7 +140,15 @@ class AutoPostClient:
     
     def build_payload(self, file_path: Path, content: bytes) -> dict:
         """Build POST payload according to specification"""
-        relative_path = str(file_path.relative_to(Path.cwd()))
+        # Get relative path (handle both absolute and relative paths)
+        try:
+            if file_path.is_absolute():
+                relative_path = str(file_path.relative_to(Path.cwd()))
+            else:
+                relative_path = str(file_path)
+        except ValueError:
+            # If relative_to fails, just use the path as-is
+            relative_path = str(file_path)
         
         payload = {
             "node_id": f"autopost-node-{self.get_hostname()}",
@@ -237,7 +246,15 @@ class AutoPostClient:
         
         # Process each file
         for file_path in files:
-            relative_path = str(file_path.relative_to(Path.cwd())).replace("\\", "/")
+            # Get relative path (handle both absolute and relative paths)
+            try:
+                if file_path.is_absolute():
+                    relative_path = str(file_path.relative_to(Path.cwd())).replace("\\", "/")
+                else:
+                    relative_path = str(file_path).replace("\\", "/")
+            except ValueError:
+                # If relative_to fails, just use the path as-is
+                relative_path = str(file_path).replace("\\", "/")
             
             # Check if already posted
             if relative_path in self.posted_files:
