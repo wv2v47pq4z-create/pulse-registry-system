@@ -1,9 +1,9 @@
 # pulse-registry-system
 Smart contracts for PulseRegistry and ZcashBridge - auto-registration and interoperability layer for Super Reality Studios blockchain ecosystem.
 
-## Super Reality OS — CloudRoutes Autobuilder v2.1
+## Super Reality OS — CloudRoutes Autobuilder v2.1 with n8n
 
-This repository includes the **Autobuilder v2.1** PowerShell script that automatically creates and configures the `super-reality-os-cloudroutes` repository with complete AWS infrastructure automation.
+This repository includes the **Autobuilder v2.1** PowerShell script that automatically creates and configures the `super-reality-os-cloudroutes` repository with complete AWS infrastructure automation and n8n workflow automation.
 
 ### Features
 
@@ -14,8 +14,9 @@ The autobuilder script (`autobuilder_v2.1.ps1`) performs the following actions:
    - S3 bucket (versioned, encrypted)
    - ECR repository for container images
    - IAM role and instance profile for SSM access
-   - Security group (egress-only, no inbound SSH)
-   - EC2 instance (t3.large, SSM-managed) with Docker
+   - Security group (port 5678 for n8n web UI, full egress)
+   - EC2 instance (t3.large, SSM-managed) with Docker + Docker Compose
+   - **n8n workflow automation** (deployed via Docker, accessible on port 5678)
 3. **Documentation**: Creates comprehensive README with usage instructions
 4. **CI/CD**: Sets up GitHub Actions workflow for shellcheck validation
 5. **Copilot Prompt**: Includes instructions for future AI-assisted development
@@ -85,10 +86,11 @@ The `aws/link_aws.sh` script provisions (region: ca-central-1):
   - AmazonSSMManagedInstanceCore
   - CloudWatchAgentServerPolicy
   - AmazonEC2ContainerRegistryReadOnly
-- **Security Group**: `sr-os-sg` (egress-only, no inbound)
+- **Security Group**: `sr-os-sg` (port 5678 for n8n, full egress)
 - **EC2 Instance**: t3.large, Amazon Linux 2023, SSM-managed
   - Tags: System=SuperRealityOS, Component=CloudRoutes, Owner=AlexLeBrun
-  - Preinstalled: Docker
+  - Preinstalled: Docker + Docker Compose
+  - **n8n**: Workflow automation tool running at `http://<public-ip>:5678`
 
 ### Running the AWS Infrastructure
 
@@ -104,11 +106,28 @@ curl -fsSL https://raw.githubusercontent.com/{user}/super-reality-os-cloudroutes
 chmod +x link_aws.sh && ./link_aws.sh
 ```
 
+### Accessing n8n Workflow Automation
+
+After deployment completes (wait 2-3 minutes for n8n to start):
+
+1. **Get EC2 Public IP**: From AWS Console or deployment output
+2. **Access n8n**: Navigate to `http://<EC2-Public-IP>:5678`
+3. **First-Time Setup**: Create your admin account
+4. **Start Building**: Create automation workflows connecting APIs, databases, and cloud services
+
+**n8n Features:**
+- Visual workflow editor
+- 400+ pre-built integrations
+- Webhook support for real-time automation
+- Scheduled workflow execution
+- Self-hosted and fully under your control
+
 ### Design Principles
 
 - **Idempotent**: Safe to run multiple times
+- **Workflow Automation**: n8n pre-configured for immediate use
 - **SSM Access**: No SSH keys required, use AWS Systems Manager
-- **Secure by Default**: Egress-only security group, encrypted storage
+- **Secure by Default**: Minimal inbound (n8n only), encrypted storage
 - **Tagged Resources**: All resources tagged for easy identification
 - **One-Click Deploy**: CloudShell integration for instant deployment
 
