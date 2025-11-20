@@ -13,3 +13,9 @@ states/
 # Optional
 .env
 .env.local
+
+# Deployment artifacts
+deploy-logs/
+node_modules/
+dist/
+build/
