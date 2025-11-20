@@ -1,0 +1,10 @@
+{
+  "api_url": "https://api.example.com/autopost",
+  "api_key": "your-api-key-here",
+  "watch_folder": "./watch_folder",
+  "scan_interval_seconds": 60,
+  "file_extensions": [".txt", ".json", ".log"],
+  "max_file_size_mb": 10,
+  "enable_logging": true,
+  "log_file": "./logs/autopost_status.jsonl"
+}
