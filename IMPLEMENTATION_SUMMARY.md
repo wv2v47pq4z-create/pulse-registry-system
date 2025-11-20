@@ -45,11 +45,25 @@ This implementation delivers a complete, production-ready Python-based autonomou
 - **`.env.example`**: Template with all required variables
 - **`.gitignore`**: Updated for Python artifacts
 
-#### Docker Deployment
+#### Deployment Automation
+- **`Makefile`**: Complete deployment automation with master prompt
+  - `make deploy-autonomous`: One-command autonomous deployment
+  - 20+ targets for setup, deployment, testing, and management
+  - Colored output for better visibility
+  - Status checking and validation
+  - Docker integration
+  
 - **`Dockerfile`**: Python 3.11 slim image with non-root user
 - **`docker-compose.yml`**: Service definition with scheduled execution support
 
 #### Documentation
+- **`MAKEFILE_GUIDE.md` (300+ lines)**: Complete Makefile deployment guide
+  - Quick start instructions
+  - All available commands
+  - Common use cases
+  - Troubleshooting guide
+  - CI/CD integration examples
+
 - **`PIPELINE_README.md` (385 lines)**: Comprehensive implementation guide
   - Architecture overview
   - Airtable schema reference
@@ -146,7 +160,18 @@ This implementation delivers a complete, production-ready Python-based autonomou
 
 ## Deployment Options
 
-### Option 1: Python Direct
+### Option 1: Make - Autonomous Deployment (Recommended)
+```bash
+make deploy-autonomous
+```
+**Master prompt** for fully autonomous deployment with:
+- Automatic dependency installation
+- Configuration validation
+- Pipeline execution
+- Results export
+See [MAKEFILE_GUIDE.md](MAKEFILE_GUIDE.md) for complete guide.
+
+### Option 2: Python Direct
 ```bash
 pip install -r requirements.txt
 cp .env.example .env
@@ -154,12 +179,14 @@ cp .env.example .env
 python main.py
 ```
 
-### Option 2: Docker
+### Option 3: Docker
 ```bash
+make deploy-docker
+# or
 docker-compose up -d
 ```
 
-### Option 3: Make.com (No-Code)
+### Option 4: Make.com (No-Code)
 - Follow MAKECOM_INTEGRATION.md
 - Use provided JSON payloads
 - Configure modules visually

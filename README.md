@@ -17,6 +17,19 @@ This repository includes a comprehensive Python-based autonomous research pipeli
 
 ### Quick Start
 
+#### Option 1: Autonomous Deployment with Make (Recommended)
+
+```bash
+# One-command autonomous deployment
+make deploy-autonomous
+```
+
+This master prompt handles everything: dependencies, validation, and execution.
+
+[📖 Full Makefile Guide](MAKEFILE_GUIDE.md)
+
+#### Option 2: Manual Python Deployment
+
 ```bash
 # Install dependencies
 pip install -r requirements.txt
@@ -29,8 +42,15 @@ cp .env.example .env
 python main.py
 ```
 
+#### Option 3: Docker Deployment
+
+```bash
+make deploy-docker
+```
+
 ### Documentation
 
+- **[Makefile Deployment Guide](MAKEFILE_GUIDE.md)** - Autonomous deployment with Make
 - **[Pipeline Documentation](PIPELINE_README.md)** - Complete guide to the Python implementation
 - **[Make.com Integration](MAKECOM_INTEGRATION.md)** - No-code automation setup guide
 
