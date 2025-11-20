@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  research-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autonomous-research-pipeline
+    env_file:
+      - .env
+    environment:
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID}
+      - AIRTABLE_TABLE_NAME=${AIRTABLE_TABLE_NAME:-Pulse Systems Research}
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ELICIT_DATA_URL=${ELICIT_DATA_URL}
+    restart: unless-stopped
+    # Uncomment the following to run on a schedule using cron
+    # command: >
+    #   sh -c "while true; do
+    #     python main.py;
+    #     echo 'Pipeline completed. Waiting 24 hours...';
+    #     sleep 86400;
+    #   done"
+    networks:
+      - research-network
+
+networks:
+  research-network:
+    driver: bridge
