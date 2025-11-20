@@ -5,6 +5,7 @@ Run this to verify your environment before running the full pipeline.
 """
 import sys
 import importlib.util
+from pathlib import Path
 
 
 def check_module(module_name):
@@ -69,7 +70,6 @@ def main():
     # Check environment configuration
     print("4. Checking environment configuration...")
     try:
-        from pathlib import Path
         env_file = Path(".env")
         env_example = Path(".env.example")
         
@@ -89,7 +89,6 @@ def main():
     # Check Docker files
     print("5. Checking Docker configuration...")
     try:
-        from pathlib import Path
         dockerfile = Path("Dockerfile")
         compose = Path("docker-compose.yml")
         

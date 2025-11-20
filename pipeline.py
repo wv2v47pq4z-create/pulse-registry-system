@@ -4,6 +4,8 @@ Core autonomous research pipeline for fetching, categorizing, and storing resear
 import os
 import json
 import logging
+import csv
+from io import StringIO
 from typing import List, Dict, Any, Optional
 import requests
 from pyairtable import Api
@@ -46,9 +48,6 @@ def fetch_papers_from_elicit(data_url: str) -> List[Dict[str, Any]]:
                 return papers.get('data', papers.get('papers', [papers]))
         except json.JSONDecodeError:
             # If not JSON, try CSV parsing
-            import csv
-            from io import StringIO
-            
             csv_data = StringIO(response.text)
             reader = csv.DictReader(csv_data)
             papers = list(reader)
@@ -57,6 +56,21 @@ def fetch_papers_from_elicit(data_url: str) -> List[Dict[str, Any]]:
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to fetch papers from {data_url}: {str(e)}")
         raise
+
+
+def escape_airtable_string(value: str) -> str:
+    """
+    Escape a string value for use in Airtable formulas.
+    Prevents formula injection by escaping single quotes.
+    
+    Args:
+        value: String to escape
+        
+    Returns:
+        Escaped string safe for Airtable formula
+    """
+    # Escape single quotes by doubling them (Airtable formula syntax)
+    return value.replace("'", "''")
 
 
 def check_duplicate_in_airtable(
@@ -81,17 +95,21 @@ def check_duplicate_in_airtable(
     try:
         # First, try to match on Elicit ID if available
         if elicit_id:
-            formula = f"{{Elicit ID}} = '{elicit_id}'"
+            # Escape elicit_id to prevent formula injection
+            escaped_id = escape_airtable_string(elicit_id)
+            formula = f"{{Elicit ID}} = '{escaped_id}'"
             records = table.all(formula=formula)
             if records:
                 logger.info(f"Found existing record by Elicit ID: {elicit_id}")
                 return records[0]
         
         # Fall back to Title and Year matching
+        # Escape title to prevent formula injection
+        escaped_title = escape_airtable_string(title)
         if year:
-            formula = f"AND({{Title}} = '{title}', {{Year}} = {year})"
+            formula = f"AND({{Title}} = '{escaped_title}', {{Year}} = {year})"
         else:
-            formula = f"{{Title}} = '{title}'"
+            formula = f"{{Title}} = '{escaped_title}'"
         
         records = table.all(formula=formula)
         if records:
