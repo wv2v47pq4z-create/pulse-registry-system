@@ -153,13 +153,13 @@ def call_claude_api(
     except json.JSONDecodeError as e:
         raise ValueError(f"Failed to parse JSON from Claude response: {str(e)}")
     except (KeyError, IndexError) as e:
-        raise ValueError(f"Unexpected response structure from Claude API: {str(e)}")
+        raise ValueError(f"Unexpected response structure from Claude API: {str(e)}") from e
     
     # Validate using Pydantic model
     try:
         validated_response = PaperCategorizationResponse(**categorization_data)
     except Exception as e:
-        raise ValueError(f"Claude response failed validation: {str(e)}")
+        raise ValueError(f"Claude response failed validation: {str(e)}") from e
     
     # Return both validated model and raw JSON string for storage
     return {

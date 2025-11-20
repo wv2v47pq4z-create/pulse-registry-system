@@ -94,12 +94,16 @@ def main():
     print(f"  Airtable Table: {os.getenv('AIRTABLE_TABLE_NAME', 'Pulse Systems Research')}")
     print(f"  Data Source: {os.getenv('ELICIT_DATA_URL')}")
     
-    # Safely display masked API key
+    # Safely display masked API key with minimum masking for security
     claude_key = os.getenv('CLAUDE_API_KEY', '')
-    if len(claude_key) >= 4:
+    if len(claude_key) >= 8:
+        # Show last 4 chars only if key is long enough
         print(f"  Claude API Key: {'*' * 20}{claude_key[-4:]}")
+    elif len(claude_key) > 0:
+        # For short keys, mask completely to prevent information leakage
+        print(f"  Claude API Key: {'*' * 20} (configured)")
     else:
-        print(f"  Claude API Key: {'*' * len(claude_key)}")
+        print(f"  Claude API Key: (not set)")
     print()
     
     # Run the pipeline

@@ -198,6 +198,32 @@ def update_airtable_record(
         raise
 
 
+def sanitize_error_message(error_msg: str) -> str:
+    """
+    Sanitize error messages to remove sensitive information before storage.
+    
+    Args:
+        error_msg: Original error message
+        
+    Returns:
+        Sanitized error message safe for storage
+    """
+    import re
+    
+    # Remove potential API keys (patterns like sk-, api-, key-)
+    sanitized = re.sub(r'(sk-|api-|key-)[a-zA-Z0-9_-]+', '[REDACTED]', error_msg, flags=re.IGNORECASE)
+    
+    # Remove file paths that might leak system information
+    sanitized = re.sub(r'/[\w/.-]+/', '[PATH]/', sanitized)
+    sanitized = re.sub(r'[A-Z]:\\[\w\\.-]+', '[PATH]', sanitized)
+    
+    # Truncate very long error messages to prevent storage issues
+    if len(sanitized) > 500:
+        sanitized = sanitized[:497] + "..."
+    
+    return sanitized
+
+
 def process_single_paper(
     table,
     paper_data: Dict[str, Any],
@@ -254,31 +280,41 @@ def process_single_paper(
             "record_id": record["id"]
         }
         
+    except requests.RequestException as e:
+        # Network or API-related errors
+        logger.error(f"Network error processing paper: {str(e)}")
+        error_msg = sanitize_error_message(f"Network error: {str(e)}")
+    except ValueError as e:
+        # Data validation or parsing errors
+        logger.error(f"Validation error processing paper: {str(e)}")
+        error_msg = sanitize_error_message(f"Validation error: {str(e)}")
     except Exception as e:
-        logger.error(f"Error processing paper: {str(e)}")
-        
-        # Try to update Airtable with failure status
-        try:
-            fields = {
-                "Title": paper_data.get("title", paper_data.get("Title", "Unknown")),
-                "Processing Status": "Failed",
-                "Failure_Reason": str(e)
-            }
-            if paper_data.get("year") or paper_data.get("Year"):
-                fields["Year"] = paper_data.get("year", paper_data.get("Year"))
-            if paper_data.get("elicit_id") or paper_data.get("Elicit ID"):
-                fields["Elicit ID"] = paper_data.get("elicit_id", paper_data.get("Elicit ID"))
-            
-            table.create(fields)
-        except Exception as record_error:
-            # If we can't even create a failure record, just log it
-            logger.error(f"Failed to create failure record: {str(record_error)}")
-        
-        return {
-            "status": "failed",
-            "paper": paper_data.get("title", "Unknown"),
-            "error": str(e)
+        # Catch-all for unexpected errors
+        logger.error(f"Unexpected error processing paper: {str(e)}")
+        error_msg = sanitize_error_message(f"Processing error: {str(e)}")
+    
+    # Try to update Airtable with failure status (after exception handling)
+    try:
+        fields = {
+            "Title": paper_data.get("title", paper_data.get("Title", "Unknown")),
+            "Processing Status": "Failed",
+            "Failure_Reason": error_msg
         }
+        if paper_data.get("year") or paper_data.get("Year"):
+            fields["Year"] = paper_data.get("year", paper_data.get("Year"))
+        if paper_data.get("elicit_id") or paper_data.get("Elicit ID"):
+            fields["Elicit ID"] = paper_data.get("elicit_id", paper_data.get("Elicit ID"))
+        
+        table.create(fields)
+    except Exception as record_error:
+        # If we can't even create a failure record, just log it
+        logger.error(f"Failed to create failure record: {str(record_error)}")
+    
+    return {
+        "status": "failed",
+        "paper": paper_data.get("title", "Unknown"),
+        "error": error_msg
+    }
 
 
 def run_autonomous_pipeline(
