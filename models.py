@@ -2,7 +2,7 @@
 Pydantic data models for research paper categorization and Claude API response validation.
 """
 from typing import Optional, Literal
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class PaperCategorizationResponse(BaseModel):
@@ -88,8 +88,9 @@ class PaperCategorizationResponse(BaseModel):
         description="Comprehensive summary of the paper"
     )
     
-    @validator('related_technologies')
-    def validate_technologies(cls, v):
+    @field_validator('related_technologies')
+    @classmethod
+    def validate_technologies(cls, v: str) -> str:
         """Ensure related technologies is a properly formatted list."""
         if v:
             technologies = [tech.strip() for tech in v.split(',') if tech.strip()]
