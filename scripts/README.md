@@ -1,19 +1,14 @@
 # Setup Scripts
 
-This directory contains automation scripts for setting up and managing related projects.
+This directory contains automation scripts for setting up and managing related projects from the inkonchain ecosystem.
 
 ## setup-ink-web-app.ps1
 
 A Windows PowerShell automation script for setting up the [inkonchain/ink-web-app](https://github.com/inkonchain/ink-web-app) project.
 
-### Features
+## setup-ink-kit.ps1
 
-- Automatically checks and switches to Node.js v20 using nvm-windows (if available)
-- Enables Corepack and activates pnpm@9.12.1
-- Clones the repository (if not already present)
-- Sets up environment variables from `.env.example`
-- Installs dependencies with pnpm
-- Runs development server or builds for production
+A Windows PowerShell automation script for setting up the [inkonchain/ink-kit](https://github.com/inkonchain/ink-kit) project.
 
 ### Prerequisites
 
@@ -24,30 +19,48 @@ A Windows PowerShell automation script for setting up the [inkonchain/ink-web-ap
   - [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) (recommended), or
   - Node.js v20 installed directly
 
+### Common Features (Both Scripts)
+
+Both scripts share the same features and usage patterns:
+
+- Automatically checks and switches to Node.js v20 using nvm-windows (if available)
+- Enables Corepack and activates pnpm@9.12.1
+- Clones the repository (if not already present)
+- Sets up environment variables from `.env.example`
+- Installs dependencies with pnpm
+- Runs development server or builds for production
+
 ### Usage
 
 #### Run development server (default):
 
 ```powershell
+# For ink-web-app
 .\scripts\setup-ink-web-app.ps1
+
+# For ink-kit
+.\scripts\setup-ink-kit.ps1
 ```
 
 Or explicitly:
 
 ```powershell
 .\scripts\setup-ink-web-app.ps1 -Action dev
+.\scripts\setup-ink-kit.ps1 -Action dev
 ```
 
 #### Build and run production server:
 
 ```powershell
 .\scripts\setup-ink-web-app.ps1 -Action build
+.\scripts\setup-ink-kit.ps1 -Action build
 ```
 
 #### Custom repository or branch:
 
 ```powershell
 .\scripts\setup-ink-web-app.ps1 -RepoUrl "https://github.com/your-fork/ink-web-app.git" -Branch "feature-branch"
+.\scripts\setup-ink-kit.ps1 -RepoUrl "https://github.com/your-fork/ink-kit.git" -Branch "feature-branch"
 ```
 
 ### Parameters
@@ -56,7 +69,9 @@ Or explicitly:
   - `dev`: Runs the development server (`pnpm dev`)
   - `build`: Builds for production and starts the server (`pnpm build && pnpm start`)
 
-- **RepoUrl**: Repository URL to clone (default: `https://github.com/inkonchain/ink-web-app.git`)
+- **RepoUrl**: Repository URL to clone
+  - Default for ink-web-app: `https://github.com/inkonchain/ink-web-app.git`
+  - Default for ink-kit: `https://github.com/inkonchain/ink-kit.git`
 
 - **Branch**: Branch or commit to checkout after cloning (default: `main`)
 
