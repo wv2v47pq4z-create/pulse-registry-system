@@ -1,0 +1,5 @@
+# Core dependencies for Autonomous Research Pipeline
+requests==2.31.0
+pyairtable==2.3.3
+pydantic==2.5.3
+python-dotenv==1.0.0
