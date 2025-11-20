@@ -10,6 +10,10 @@ A Windows PowerShell automation script for setting up the [inkonchain/ink-web-ap
 
 A Windows PowerShell automation script for setting up the [inkonchain/ink-kit](https://github.com/inkonchain/ink-kit) project.
 
+## setup-node.ps1
+
+A Windows PowerShell automation script for setting up the [inkonchain/node](https://github.com/inkonchain/node) project.
+
 ### Prerequisites
 
 - Windows operating system
@@ -19,9 +23,9 @@ A Windows PowerShell automation script for setting up the [inkonchain/ink-kit](h
   - [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) (recommended), or
   - Node.js v20 installed directly
 
-### Common Features (Both Scripts)
+### Common Features (All Scripts)
 
-Both scripts share the same features and usage patterns:
+All scripts share the same features and usage patterns:
 
 - Automatically checks and switches to Node.js v20 using nvm-windows (if available)
 - Enables Corepack and activates pnpm@9.12.1
@@ -40,6 +44,9 @@ Both scripts share the same features and usage patterns:
 
 # For ink-kit
 .\scripts\setup-ink-kit.ps1
+
+# For node
+.\scripts\setup-node.ps1
 ```
 
 Or explicitly:
@@ -47,6 +54,7 @@ Or explicitly:
 ```powershell
 .\scripts\setup-ink-web-app.ps1 -Action dev
 .\scripts\setup-ink-kit.ps1 -Action dev
+.\scripts\setup-node.ps1 -Action dev
 ```
 
 #### Build and run production server:
@@ -54,6 +62,7 @@ Or explicitly:
 ```powershell
 .\scripts\setup-ink-web-app.ps1 -Action build
 .\scripts\setup-ink-kit.ps1 -Action build
+.\scripts\setup-node.ps1 -Action build
 ```
 
 #### Custom repository or branch:
@@ -61,6 +70,7 @@ Or explicitly:
 ```powershell
 .\scripts\setup-ink-web-app.ps1 -RepoUrl "https://github.com/your-fork/ink-web-app.git" -Branch "feature-branch"
 .\scripts\setup-ink-kit.ps1 -RepoUrl "https://github.com/your-fork/ink-kit.git" -Branch "feature-branch"
+.\scripts\setup-node.ps1 -RepoUrl "https://github.com/your-fork/node.git" -Branch "feature-branch"
 ```
 
 ### Parameters
@@ -72,6 +82,7 @@ Or explicitly:
 - **RepoUrl**: Repository URL to clone
   - Default for ink-web-app: `https://github.com/inkonchain/ink-web-app.git`
   - Default for ink-kit: `https://github.com/inkonchain/ink-kit.git`
+  - Default for node: `https://github.com/inkonchain/node.git`
 
 - **Branch**: Branch or commit to checkout after cloning (default: `main`)
 
