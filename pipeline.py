@@ -270,8 +270,9 @@ def process_single_paper(
                 fields["Elicit ID"] = paper_data.get("elicit_id", paper_data.get("Elicit ID"))
             
             table.create(fields)
-        except:
-            pass  # If we can't even create a failure record, just log it
+        except Exception as record_error:
+            # If we can't even create a failure record, just log it
+            logger.error(f"Failed to create failure record: {str(record_error)}")
         
         return {
             "status": "failed",
