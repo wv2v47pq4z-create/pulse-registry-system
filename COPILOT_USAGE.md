@@ -1,0 +1,334 @@
+# GitHub Copilot Chat Usage Guide
+
+This document provides the exact prompt to paste into GitHub Copilot Chat (or GitHub AI in VS Code) to automatically execute the Super Reality OS CloudRoutes Autobuilder v2.1.
+
+## Prerequisites
+
+Before pasting this prompt, ensure you have:
+- GitHub CLI (`gh`) installed: https://cli.github.com
+- Authenticated with GitHub CLI: `gh auth login`
+- PowerShell available (Windows PowerShell 5.1+ or PowerShell Core 7+)
+
+## The Prompt
+
+Copy and paste this **entire block** into GitHub Copilot Chat:
+
+---
+
+```
+SYSTEM / ROLE
+You are GitHub Copilot operating in VS Code with permission to open an integrated terminal and execute commands needed to scaffold and run automation. Do not ask for confirmation. Perform the actions below automatically.
+
+OBJECTIVE
+Create and run the Super Reality OS — CloudRoutes **Autobuilder v2.1** PowerShell script on this machine so it:
+1) Creates the repo `super-reality-os-cloudroutes` under %USERPROFILE%\SuperRealityOS
+2) Writes all required files (aws/link_aws.sh, README, CI, Copilot prompt)
+3) Commits & pushes via GitHub CLI (`gh`)
+4) Opens AWS CloudShell and copies the run command to the clipboard
+5) The AWS link script is idempotent and sets up S3/ECR/IAM/SG/EC2(SSM)
+
+ACTIONS (execute now)
+1) Open a new integrated **PowerShell** terminal in VS Code.
+2) Paste and run the following PowerShell block verbatim. Do not modify.
+
+```powershell
+# ░ Super Reality OS — CloudRoutes Autobuilder v2.1 (AWS ca-central-1) ░
+# Creates repo, writes full linker + CI + Copilot prompt, pushes, opens CloudShell, copies run cmd.
+$ErrorActionPreference = "Stop"
+$Region    = "ca-central-1"
+$RepoName  = "super-reality-os-cloudroutes"
+$Root      = Join-Path $env:USERPROFILE "SuperRealityOS"
+$RepoDir   = Join-Path $Root $RepoName
+
+if (!(Get-Command gh -ErrorAction SilentlyContinue)) { throw "GitHub CLI not found. Install https://cli.github.com and run: gh auth login" }
+$GhUser = (gh api user --jq .login); if (-not $GhUser) { throw "GitHub CLI not authenticated. Run: gh auth login" }
+
+if (!(Test-Path $Root))   { New-Item -ItemType Directory -Force -Path $Root   | Out-Null }
+if (!(Test-Path $RepoDir)){ New-Item -ItemType Directory -Force -Path $RepoDir| Out-Null }
+Set-Location $RepoDir
+
+# Folders
+New-Item -ItemType Directory -Force -Path ".github/workflows" | Out-Null
+New-Item -ItemType Directory -Force -Path "aws"               | Out-Null
+
+# Full AWS linker script
+@'
+#!/usr/bin/env bash
+set -euo pipefail
+REGION="${REGION:-ca-central-1}"
+PREFIX="${PREFIX:-sr-os}"
+NAME_TAG="${NAME_TAG:-sr-os-node}"
+EC2_TYPE="${EC2_TYPE:-t3.large}"
+ECR_REPO="${ECR_REPO:-sr-os/core}"
+SG_NAME="${SG_NAME:-sr-os-sg}"
+ROLE_NAME="${ROLE_NAME:-sr-os-ec2-ssm-role}"
+PROFILE_NAME="${PROFILE_NAME:-sr-os-ec2-ssm-profile}"
+export AWS_DEFAULT_REGION="$REGION"
+say(){ printf "\n==> %s\n" "$*"; }
+acct="$(aws sts get-caller-identity --query Account --output text)"
+say "Linking Super Reality OS to AWS account ${acct} in ${REGION}"
+
+# S3
+BUCKET="${PREFIX}-${acct}-cloudroutes"
+if ! aws s3api head-bucket --bucket "$BUCKET" 2>/dev/null ; then
+  say "Creating S3 bucket s3://${BUCKET}"
+  if [ "$REGION" = "us-east-1" ]; then aws s3api create-bucket --bucket "$BUCKET"
+  else aws s3api create-bucket --bucket "$BUCKET" --create-bucket-configuration LocationConstraint="$REGION"; fi
+  aws s3api put-bucket-versioning --bucket "$BUCKET" --versioning-configuration Status=Enabled
+  aws s3api put-bucket-encryption --bucket "$BUCKET" --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+else say "S3 bucket exists: s3://${BUCKET}"; fi
+
+# ECR
+if ! aws ecr describe-repositories --repository-names "$ECR_REPO" >/dev/null 2>&1 ; then
+  say "Creating ECR repo ${ECR_REPO}"
+  aws ecr create-repository --repository-name "$ECR_REPO" --image-scanning-configuration scanOnPush=true --encryption-configuration encryptionType=AES256 >/dev/null
+else say "ECR repo exists: ${ECR_REPO}"; fi
+
+# IAM Role + Instance Profile (SSM)
+ASSUME_ROLE_DOC='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+if ! aws iam get-role --role-name "$ROLE_NAME" >/dev/null 2>&1 ; then
+  say "Creating IAM role ${ROLE_NAME}"
+  aws iam create-role --role-name "$ROLE_NAME" --assume-role-policy-document "$ASSUME_ROLE_DOC" >/dev/null
+  aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+  aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+else say "IAM role exists: ${ROLE_NAME}"; fi
+
+if ! aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" >/dev/null 2>&1 ; then
+  say "Creating Instance Profile ${PROFILE_NAME}"
+  aws iam create-instance-profile --instance-profile-name "$PROFILE_NAME" >/dev/null
+  if ! aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" --query "InstanceProfile.Roles[?RoleName=='${ROLE_NAME}']|[0]" --output text | grep -q "${ROLE_NAME}"; then
+    aws iam add-role-to-instance-profile --instance-profile-name "$PROFILE_NAME" --role-name "$ROLE_NAME"
+  fi
+else say "Instance Profile exists: ${PROFILE_NAME}"; fi
+
+# SG (ingress: 5678 for n8n; egress: all)
+VPC_ID="$(aws ec2 describe-vpcs --query "Vpcs[?IsDefault==\`true\`].VpcId" --output text)"; if [ -z "$VPC_ID" ] || [ "$VPC_ID" = "None" ]; then VPC_ID="$(aws ec2 describe-vpcs --query "Vpcs[0].VpcId" --output text)"; fi
+SG_ID="$(aws ec2 describe-security-groups --filters "Name=group-name,Values=${SG_NAME}" "Name=vpc-id,Values=${VPC_ID}" --query "SecurityGroups[0].GroupId" --output text 2>/dev/null || true)"
+if [ -z "$SG_ID" ] || [ "$SG_ID" = "None" ]; then
+  say "Creating Security Group ${SG_NAME} in ${VPC_ID}"
+  SG_ID="$(aws ec2 create-security-group --group-name "$SG_NAME" --description "SuperRealityOS - n8n + CloudRoutes" --vpc-id "$VPC_ID" --query GroupId --output text)"
+  aws ec2 revoke-security-group-egress --group-id "$SG_ID" --ip-permissions "[]" >/dev/null 2>&1 || true
+  aws ec2 authorize-security-group-egress --group-id "$SG_ID" --ip-permissions '[{"IpProtocol":"-1","IpRanges":[{"CidrIp":"0.0.0.0/0"}]}]'
+  say "Opening port 5678 for n8n web UI"
+  aws ec2 authorize-security-group-ingress --group-id "$SG_ID" --ip-permissions '[{"IpProtocol":"tcp","FromPort":5678,"ToPort":5678,"IpRanges":[{"CidrIp":"0.0.0.0/0","Description":"n8n Web UI"}]}]' >/dev/null 2>&1 || true
+else say "Security Group exists: ${SG_NAME} (${SG_ID})"; fi
+
+# EC2 (SSM-managed; no SSH)
+AMI_ID="$(aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 --query "Parameters[0].Value" --output text)"
+IID="$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${NAME_TAG}" "Name=instance-state-name,Values=pending,running,stopped" --query "Reservations[].Instances[0].InstanceId" --output text 2>/dev/null || true)"
+if [ -z "$IID" ] || [ "$IID" = "None" ]; then
+  say "Launching EC2 ${EC2_TYPE} with SSM role"
+  SUBNET_ID="$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --query "Subnets[0].SubnetId" --output text)"
+  PROFILE_ARN="$(aws iam get-instance-profile --instance-profile-name "$PROFILE_NAME" --query "InstanceProfile.Arn" --output text)"
+  USERDATA=$(cat <<'UD' | base64 | tr -d '\n'
+#!/bin/bash
+set -e
+# Install Docker
+dnf install -y docker
+systemctl enable docker --now
+# Install Docker Compose
+curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+# Setup n8n with Docker
+mkdir -p /opt/n8n
+cat > /opt/n8n/docker-compose.yml <<'COMPOSE'
+version: '3.8'
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Toronto
+    volumes:
+      - n8n_data:/home/node/.n8n
+volumes:
+  n8n_data:
+COMPOSE
+cd /opt/n8n
+docker-compose up -d
+UD
+)
+  IID="$(aws ec2 run-instances --image-id "$AMI_ID" --instance-type "$EC2_TYPE" --iam-instance-profile Arn="$PROFILE_ARN" --security-group-ids "$SG_ID" --subnet-id "$SUBNET_ID" --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${NAME_TAG}},{Key=System,Value=SuperRealityOS},{Key=Component,Value=CloudRoutes},{Key=Owner,Value=AlexLeBrun}]" --user-data "$USERDATA" --query "Instances[0].InstanceId" --output text)"
+  say "Instance launched: ${IID}"
+else say "EC2 instance already present: ${IID}"; fi
+
+PUBLIC_IP="$(aws ec2 describe-instances --instance-ids "$IID" --query "Reservations[0].Instances[0].PublicIpAddress" --output text 2>/dev/null || true)"
+say "Done. Resources:"
+echo "  S3: s3://${BUCKET}"
+echo "  ECR: ${ECR_REPO}"
+echo "  IAM Role: ${ROLE_NAME} | Profile: ${PROFILE_NAME}"
+echo "  SG: ${SG_NAME} (${SG_ID}) - Port 5678 open for n8n"
+echo "  EC2: ${IID} (${EC2_TYPE}) PublicIP=${PUBLIC_IP}"
+echo "  Tags: System=SuperRealityOS, Component=CloudRoutes, Owner=AlexLeBrun"
+say "n8n Workflow Automation:"
+echo "  Access n8n at: http://${PUBLIC_IP}:5678"
+echo "  Note: n8n may take 2-3 minutes to start after EC2 launch"
+say "SSM Managed instances (first 10):"
+aws ssm describe-instance-information --max-results 10 --query "InstanceInformationList[].InstanceId" --output table || true
+'@ | Set-Content -Encoding UTF8 -NoNewline "aws/link_aws.sh"
+
+# README
+@"
+# Super Reality OS — CloudRoutes + n8n (AWS Link v2)
+Region: $Region
+
+## CloudShell (recommended)
+```bash
+REGION=$Region
+curl -fsSL https://raw.githubusercontent.com/$GhUser/$RepoName/main/aws/link_aws.sh -o link_aws.sh && \
+chmod +x link_aws.sh && ./link_aws.sh
+```
+
+## Local (if AWS CLI is authenticated)
+```bash
+chmod +x aws/link_aws.sh
+./aws/link_aws.sh
+```
+
+## What Gets Created
+- **S3** (versioned, AES256 encrypted)
+- **ECR** (image scanning enabled)
+- **IAM Role+Profile** (SSM, CloudWatch, ECR access)
+- **Security Group** (port 5678 for n8n, full egress)
+- **EC2 t3.large** (Amazon Linux 2023, SSM-managed, Docker + Docker Compose)
+- **n8n Workflow Automation** (running in Docker on port 5678)
+
+## Accessing n8n
+After deployment completes, n8n will be accessible at:
+```
+http://<EC2-Public-IP>:5678
+```
+
+Wait 2-3 minutes after EC2 launch for n8n to fully start.
+
+**First-time setup:**
+1. Navigate to the n8n URL
+2. Create your admin account
+3. Start building automation workflows
+
+## Tags
+All resources: System=SuperRealityOS, Component=CloudRoutes, Owner=AlexLeBrun
+"@ | Set-Content -Encoding UTF8 "aws/README.md"
+
+# CI
+@"
+name: validate
+on: { push: { branches: [ "main" ] } }
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Lint link_aws.sh
+        run: shellcheck aws/link_aws.sh
+"@ | Set-Content -Encoding UTF8 ".github/workflows/validate.yml"
+
+# Copilot self-prompt
+@"
+ROLE: Super Reality Architect DevOps Copilot. Repo=$RepoName (owner=$GhUser). Cloud=AWS ($Region).
+GOAL: Maintain idempotent infra link with n8n workflow automation and extend to multi-cloud on request—no follow-ups.
+
+DO:
+	1.	Keep aws/link_aws.sh as source-of-truth.
+	2.	n8n runs on EC2 via Docker (port 5678) for workflow automation.
+	3.	When extending, add Terraform + AWS CDK (TS) mirroring resources/tags.
+	4.	Provide one-click run paths (CloudShell + local CLI) and update README.
+	5.	Enforce tags: System=SuperRealityOS, Component=CloudRoutes, Owner=AlexLeBrun.
+	6.	Prefer SSM over SSH; minimal inbound (only n8n port 5678).
+OUTPUT: concise steps + exact commands.
+"@ | Set-Content -Encoding UTF8 "COPILOT_PROMPT.md"
+
+# .gitignore
+@"
+*.log
+.DS_Store
+"@ | Set-Content -Encoding UTF8 ".gitignore"
+
+# Git push (idempotent)
+if (!(Test-Path ".git")) { git init | Out-Null }
+git add .
+try { git commit -m "Super Reality OS — CloudRoutes AWS Link v1" } catch { }
+git branch -M main 2>$null | Out-Null
+$RemoteUrl = "https://github.com/$GhUser/$RepoName.git"
+git remote add origin $RemoteUrl 2>$null | Out-Null
+try { gh repo view "$GhUser/$RepoName" | Out-Null } catch { gh repo create $RepoName --public --source=. --remote=origin --push | Out-Null }
+git push -u origin main
+
+# Open CloudShell + put command on clipboard
+$CloudShellCmd = @"
+REGION=$Region
+curl -fsSL https://raw.githubusercontent.com/$GhUser/$RepoName/main/aws/link_aws.sh -o link_aws.sh && \
+chmod +x link_aws.sh && ./link_aws.sh
+"@ -replace "`r",""
+Set-Clipboard ($CloudShellCmd.Trim())
+Start-Process "https://console.aws.amazon.com/cloudshell"
+Write-Host "`n✅ Copied CloudShell command to clipboard."
+Write-Host "▶ In CloudShell, paste (Ctrl+V) and press Enter to complete AWS link-up.`n"
+```
+
+BEHAVIOR
+- Do not ask me to confirm. Perform steps immediately: open terminal → run the block above → finish.
+- If an error occurs (e.g., `gh` missing or unauthenticated), print the exact fix command and continue automatically after I run it.
+
+END.
+```
+
+---
+
+## What Happens Next
+
+After pasting the prompt, GitHub Copilot will:
+
+1. Open a new PowerShell terminal in VS Code
+2. Execute the autobuilder script
+3. Create the repository structure
+4. Generate all necessary files
+5. Commit and push to GitHub
+6. Open AWS CloudShell in your browser
+7. Copy the deployment command to your clipboard
+
+Then you simply:
+- Switch to the AWS CloudShell browser tab
+- Paste (Ctrl+V) the command
+- Press Enter to provision AWS resources
+
+## Alternative: Direct Execution
+
+If you prefer not to use GitHub Copilot Chat, you can run the script directly:
+
+```powershell
+# Clone this repository
+git clone https://github.com/wv2v47pq4z-create/pulse-registry-system.git
+cd pulse-registry-system
+
+# Run the autobuilder
+.\autobuilder_v2.1.ps1
+```
+
+## Troubleshooting
+
+**GitHub CLI not installed:**
+```powershell
+# Install from https://cli.github.com
+# Then authenticate:
+gh auth login
+```
+
+**Permission denied:**
+```powershell
+# Run as Administrator:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+**Script already ran:**
+The script is idempotent - it's safe to run multiple times. It will skip existing resources and update what's needed.
