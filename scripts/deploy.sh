@@ -65,9 +65,13 @@ echo "Pod IPs: $POD_IPS"
 # Check health of each pod
 for ip in $POD_IPS; do
     echo "Checking health of pod at $ip..."
-    kubectl run health-check-temp --rm -i --restart=Never --image=curlimages/curl:latest -- \
+    # Use unique pod name to avoid conflicts
+    POD_NAME="health-check-$(date +%s)-$$"
+    kubectl run $POD_NAME --rm -i --restart=Never --image=curlimages/curl:latest -- \
         curl -sf http://${ip}:8080/health || {
         echo "Health check failed for pod at $ip"
+        # Clean up if pod still exists
+        kubectl delete pod $POD_NAME --ignore-not-found=true 2>/dev/null || true
         exit 1
     }
     echo "Pod at $ip is healthy"

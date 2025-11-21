@@ -19,7 +19,7 @@ from .sr_agents import get_agent_manager
 setup_logging()
 logger = get_logger("graph")
 
-# Prometheus metrics
+# Prometheus metrics - Global counters and gauges
 sr_hybrid_total_messages = Counter(
     'sr_hybrid_total_messages',
     'Total number of messages processed'
@@ -51,6 +51,26 @@ sr_hybrid_errors_total = Counter(
     'Total number of errors',
     ['error_type']
 )
+
+
+def track_message():
+    """Track a message being processed."""
+    sr_hybrid_total_messages.inc()
+
+
+def track_grounding():
+    """Track a grounding operation."""
+    sr_hybrid_grounding_total.inc()
+
+
+def track_agent_call(agent_name: str):
+    """Track an agent call."""
+    sr_hybrid_agent_calls_total.labels(agent_name=agent_name).inc()
+
+
+def update_drift_score(score: float):
+    """Update the drift score gauge."""
+    sr_hybrid_drift_score.set(score)
 
 
 class SRHybridServer(BaseHTTPRequestHandler):
@@ -88,22 +108,13 @@ class SRHybridServer(BaseHTTPRequestHandler):
         """Prometheus metrics endpoint."""
         try:
             # Update current metrics from system state
-            state_manager = get_state_manager()
             recursion_guard = get_recursion_guard()
-            grounding_engine = get_grounding_engine()
-            bridge = get_bridge()
-            agent_manager = get_agent_manager()
             
-            # Update gauges
+            # Update gauges with current values
             sr_hybrid_recursion_depth.set(recursion_guard.depth)
             
-            # Update counters from system state
-            sr_hybrid_total_messages.inc(0)  # Just ensure it exists
-            sr_hybrid_grounding_total._value._value = grounding_engine.grounding_count
-            
-            # Update agent call counts
-            for agent_name, stats in agent_manager.get_stats().items():
-                sr_hybrid_agent_calls_total.labels(agent_name=agent_name)._value._value = stats['call_count']
+            # Note: Counters are updated through application logic, not here
+            # The metrics endpoint just exposes current counter values
             
             metrics = generate_latest()
             self.send_response(200)

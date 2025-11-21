@@ -27,6 +27,13 @@ class Agent:
         self.last_called = datetime.utcnow().isoformat()
         logger.debug(f"Agent {self.name} called (count={self.call_count})")
         
+        # Track metric for monitoring
+        try:
+            from .sr_graph import track_agent_call
+            track_agent_call(self.name)
+        except ImportError:
+            pass  # Metrics not available yet during initialization
+        
         try:
             result = self.handler(*args, **kwargs)
             logger.debug(f"Agent {self.name} completed successfully")

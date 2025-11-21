@@ -43,6 +43,13 @@ class Bridge:
         try:
             self.message_count += 1
             
+            # Track metric for monitoring
+            try:
+                from .sr_graph import track_message
+                track_message()
+            except ImportError:
+                pass  # Metrics not available yet during initialization
+            
             envelope = {
                 "id": f"msg_{self.message_count}",
                 "source": source,
