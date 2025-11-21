@@ -6,6 +6,7 @@ from datetime import datetime
 from .sr_logging import get_logger
 from .sr_errors import GroundingError
 from .sr_state import get_state_manager
+from .sr_metrics import track_grounding
 
 logger = get_logger("grounding")
 
@@ -37,7 +38,6 @@ class GroundingEngine:
             logger.info(f"Grounding cycle {self.grounding_count} started")
             
             # Track metric for monitoring
-            from .sr_metrics import track_grounding
             track_grounding()
             
             grounded = data.copy()

@@ -7,6 +7,7 @@ from .sr_logging import get_logger
 from .sr_errors import AgentError
 from .sr_recursion import get_recursion_guard
 from .sr_state import get_state_manager
+from .sr_metrics import track_agent_call
 
 logger = get_logger("agents")
 
@@ -28,7 +29,6 @@ class Agent:
         logger.debug(f"Agent {self.name} called (count={self.call_count})")
         
         # Track metric for monitoring
-        from .sr_metrics import track_agent_call
         track_agent_call(self.name)
         
         try:

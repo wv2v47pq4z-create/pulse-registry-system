@@ -6,6 +6,7 @@ from datetime import datetime
 from .sr_logging import get_logger
 from .sr_errors import BridgeError
 from .sr_state import get_state_manager
+from .sr_metrics import track_message
 
 logger = get_logger("bridge")
 
@@ -44,7 +45,6 @@ class Bridge:
             self.message_count += 1
             
             # Track metric for monitoring
-            from .sr_metrics import track_message
             track_message()
             
             envelope = {
