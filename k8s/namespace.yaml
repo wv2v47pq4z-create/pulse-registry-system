@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sr-hybrid
+  labels:
+    name: sr-hybrid
+    app.kubernetes.io/name: sr-hybrid
+    app.kubernetes.io/part-of: super-reality-os

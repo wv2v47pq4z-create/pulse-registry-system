@@ -1,0 +1,113 @@
+{
+  "dashboard": {
+    "title": "SR-HYBRID System Dashboard",
+    "tags": ["sr-hybrid", "system"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Messages",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sr_hybrid_total_messages",
+            "legendFormat": "Total Messages"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Recursion Depth",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sr_hybrid_recursion_depth",
+            "legendFormat": "Recursion Depth"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Drift Score",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sr_hybrid_drift_score",
+            "legendFormat": "Drift Score"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "id": 4,
+        "title": "Grounding Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(sr_hybrid_grounding_total[5m])",
+            "legendFormat": "Grounding Rate"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        }
+      },
+      {
+        "id": 5,
+        "title": "Agent Calls by Agent",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(sr_hybrid_agent_calls_total[5m])",
+            "legendFormat": "{{agent_name}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "id": 6,
+        "title": "Errors by Type",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(sr_hybrid_errors_total[5m])",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        }
+      }
+    ],
+    "schemaVersion": 16,
+    "version": 1
+  }
+}

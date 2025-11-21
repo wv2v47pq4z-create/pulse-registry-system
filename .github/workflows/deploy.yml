@@ -1,0 +1,179 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+      version:
+        description: 'Blue or Green deployment'
+        required: true
+        default: 'blue'
+        type: choice
+        options:
+          - blue
+          - green
+
+jobs:
+  deploy:
+    name: Blue/Green Deployment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG_B64 }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$KUBE_CONFIG_B64" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Verify cluster connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Update deployment image
+        env:
+          VERSION: ${{ inputs.version }}
+          IMAGE_TAG: ${{ secrets.DOCKER_REGISTRY }}/sr-hybrid:${{ github.sha }}
+        run: |
+          # Update the deployment with new image
+          kubectl set image deployment/sr-hybrid-${VERSION} \
+            sr-hybrid=${IMAGE_TAG} \
+            -n sr-hybrid
+
+      - name: Wait for rollout
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          kubectl rollout status deployment/sr-hybrid-${VERSION} -n sr-hybrid --timeout=5m
+
+      - name: Health check with exponential backoff
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          max_retries=10
+          retry_count=0
+          wait_time=2
+          
+          while [ $retry_count -lt $max_retries ]; do
+            echo "Health check attempt $((retry_count + 1))/$max_retries..."
+            
+            # Get pod IPs for the version
+            pod_ips=$(kubectl get pods -n sr-hybrid -l app=sr-hybrid,version=${VERSION} \
+              -o jsonpath='{.items[*].status.podIP}')
+            
+            all_healthy=true
+            for ip in $pod_ips; do
+              # Use unique pod name with run number to avoid conflicts
+              pod_name="health-check-${VERSION}-${GITHUB_RUN_NUMBER}-${retry_count}"
+              if ! kubectl run $pod_name --rm -i --restart=Never \
+                -n sr-hybrid \
+                --image=curlimages/curl:latest -- \
+                curl -sf http://${ip}:8080/health 2>/dev/null; then
+                all_healthy=false
+                # Clean up failed pod if it still exists
+                kubectl delete pod $pod_name -n sr-hybrid --ignore-not-found=true 2>/dev/null || true
+                break
+              fi
+            done
+            
+            if [ "$all_healthy" = true ]; then
+              echo "All pods healthy!"
+              exit 0
+            fi
+            
+            echo "Health check failed. Waiting ${wait_time}s before retry..."
+            sleep $wait_time
+            
+            retry_count=$((retry_count + 1))
+            wait_time=$((wait_time * 2))
+          done
+          
+          echo "Health check failed after $max_retries attempts"
+          exit 1
+
+      - name: Switch service to new version
+        if: success()
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          # Update service selector to point to the new version
+          kubectl patch service sr-hybrid -n sr-hybrid -p \
+            '{"spec":{"selector":{"version":"'${VERSION}'"}}}'
+          
+          echo "Service switched to ${VERSION} version"
+
+      - name: Verify service
+        if: success()
+        run: |
+          kubectl get service sr-hybrid -n sr-hybrid -o wide
+          kubectl get endpoints sr-hybrid -n sr-hybrid
+
+      - name: Collect deployment logs
+        if: always()
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          mkdir -p deploy-logs
+          kubectl logs -n sr-hybrid -l app=sr-hybrid,version=${VERSION} \
+            --tail=500 > deploy-logs/pods-${VERSION}.log || true
+          kubectl describe deployment sr-hybrid-${VERSION} -n sr-hybrid \
+            > deploy-logs/deployment-${VERSION}.txt || true
+          kubectl describe service sr-hybrid -n sr-hybrid \
+            > deploy-logs/service.txt || true
+
+      - name: Upload deployment logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-logs-${{ inputs.version }}-${{ github.run_number }}
+          path: deploy-logs/
+
+      - name: Rollback on failure
+        if: failure()
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          echo "Deployment failed. Rolling back..."
+          kubectl rollout undo deployment/sr-hybrid-${VERSION} -n sr-hybrid
+          kubectl rollout status deployment/sr-hybrid-${VERSION} -n sr-hybrid --timeout=3m
+
+      - name: Send Slack notification
+        if: always() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "SR-HYBRID Deployment ${{ job.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*SR-HYBRID Deployment*\n*Status:* ${{ job.status }}\n*Version:* ${{ inputs.version }}\n*Environment:* ${{ inputs.environment }}\n*Commit:* ${{ github.sha }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
