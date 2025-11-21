@@ -37,11 +37,8 @@ class GroundingEngine:
             logger.info(f"Grounding cycle {self.grounding_count} started")
             
             # Track metric for monitoring
-            try:
-                from .sr_graph import track_grounding
-                track_grounding()
-            except ImportError:
-                pass  # Metrics not available yet during initialization
+            from .sr_metrics import track_grounding
+            track_grounding()
             
             grounded = data.copy()
             grounded["_grounded_at"] = datetime.utcnow().isoformat()

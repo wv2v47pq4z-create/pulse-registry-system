@@ -4,7 +4,7 @@ import os
 import json
 from typing import Dict, Any
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
 from .sr_logging import setup_logging, get_logger
 from .sr_state import get_state_manager
@@ -14,63 +14,11 @@ from .sr_routing import get_router
 from .sr_bridge import get_bridge
 from .sr_conflict import get_conflict_resolver
 from .sr_agents import get_agent_manager
+from .sr_metrics import sr_hybrid_recursion_depth, sr_hybrid_errors_total
 
 # Setup logging
 setup_logging()
 logger = get_logger("graph")
-
-# Prometheus metrics - Global counters and gauges
-sr_hybrid_total_messages = Counter(
-    'sr_hybrid_total_messages',
-    'Total number of messages processed'
-)
-
-sr_hybrid_recursion_depth = Gauge(
-    'sr_hybrid_recursion_depth',
-    'Current recursion depth'
-)
-
-sr_hybrid_drift_score = Gauge(
-    'sr_hybrid_drift_score',
-    'Current drift score'
-)
-
-sr_hybrid_grounding_total = Counter(
-    'sr_hybrid_grounding_total',
-    'Total number of grounding operations'
-)
-
-sr_hybrid_agent_calls_total = Counter(
-    'sr_hybrid_agent_calls_total',
-    'Total number of agent calls',
-    ['agent_name']
-)
-
-sr_hybrid_errors_total = Counter(
-    'sr_hybrid_errors_total',
-    'Total number of errors',
-    ['error_type']
-)
-
-
-def track_message():
-    """Track a message being processed."""
-    sr_hybrid_total_messages.inc()
-
-
-def track_grounding():
-    """Track a grounding operation."""
-    sr_hybrid_grounding_total.inc()
-
-
-def track_agent_call(agent_name: str):
-    """Track an agent call."""
-    sr_hybrid_agent_calls_total.labels(agent_name=agent_name).inc()
-
-
-def update_drift_score(score: float):
-    """Update the drift score gauge."""
-    sr_hybrid_drift_score.set(score)
 
 
 class SRHybridServer(BaseHTTPRequestHandler):

@@ -84,11 +84,12 @@ jobs:
               # Use unique pod name with run number to avoid conflicts
               pod_name="health-check-${VERSION}-${GITHUB_RUN_NUMBER}-${retry_count}"
               if ! kubectl run $pod_name --rm -i --restart=Never \
+                -n sr-hybrid \
                 --image=curlimages/curl:latest -- \
                 curl -sf http://${ip}:8080/health 2>/dev/null; then
                 all_healthy=false
                 # Clean up failed pod if it still exists
-                kubectl delete pod $pod_name -n default --ignore-not-found=true 2>/dev/null || true
+                kubectl delete pod $pod_name -n sr-hybrid --ignore-not-found=true 2>/dev/null || true
                 break
               fi
             done

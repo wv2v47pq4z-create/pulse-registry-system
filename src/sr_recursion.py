@@ -16,7 +16,6 @@ class RecursionGuard:
     def __init__(self, max_depth: int = 100):
         self.max_depth = max_depth
         self._depth = threading.local()
-        self._lock = threading.Lock()
         logger.info(f"RecursionGuard initialized with max_depth={max_depth}")
     
     @property

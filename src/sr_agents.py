@@ -28,11 +28,8 @@ class Agent:
         logger.debug(f"Agent {self.name} called (count={self.call_count})")
         
         # Track metric for monitoring
-        try:
-            from .sr_graph import track_agent_call
-            track_agent_call(self.name)
-        except ImportError:
-            pass  # Metrics not available yet during initialization
+        from .sr_metrics import track_agent_call
+        track_agent_call(self.name)
         
         try:
             result = self.handler(*args, **kwargs)
