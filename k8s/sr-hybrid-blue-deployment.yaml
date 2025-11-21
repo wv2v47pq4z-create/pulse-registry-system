@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sr-hybrid-blue
+  namespace: sr-hybrid
+  labels:
+    app: sr-hybrid
+    version: blue
+    app.kubernetes.io/name: sr-hybrid
+    app.kubernetes.io/part-of: super-reality-os
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: sr-hybrid
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: sr-hybrid
+        version: blue
+        app.kubernetes.io/name: sr-hybrid
+        app.kubernetes.io/part-of: super-reality-os
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: sr-hybrid
+          image: your-registry/sr-hybrid:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: sr-hybrid-secrets
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: sr-hybrid-data-pvc
+        - name: logs
+          persistentVolumeClaim:
+            claimName: sr-hybrid-logs-pvc

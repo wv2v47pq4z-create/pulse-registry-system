@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  sr-hybrid:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: sr-hybrid
+    ports:
+      - "8080:8080"
+    environment:
+      - SR_HOST=0.0.0.0
+      - SR_PORT=8080
+      - SR_LOG_LEVEL=INFO
+      - SR_LOG_DIR=/app/logs
+      - SR_LOG_FILE_ENABLED=true
+    volumes:
+      - ../src:/app/src
+      - ../tests:/app/tests
+      - sr-data:/app/data
+      - sr-logs:/app/logs
+    networks:
+      - sr-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: sr-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - sr-network
+    depends_on:
+      - sr-hybrid
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: sr-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ../monitoring/grafana-dashboard.json:/etc/grafana/provisioning/dashboards/sr-hybrid.json:ro
+    networks:
+      - sr-network
+    depends_on:
+      - prometheus
+
+volumes:
+  sr-data:
+  sr-logs:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  sr-network:
+    driver: bridge
