@@ -20,6 +20,12 @@ interface IPulseToken {
  * This matches the closed-loop model:
  * - Tokens only move from pre-funded escrows to contributors.
  * - No new supply is created inside this contract.
+ *
+ * @dev Token Compatibility Note:
+ * This contract expects IPulseToken to be a standard ERC20 implementation
+ * that returns boolean values from transfer and transferFrom operations.
+ * For maximum compatibility with non-standard tokens, consider using
+ * OpenZeppelin's SafeERC20 wrapper or verify token behavior before deployment.
  */
 contract PulseEscrowPool {
     // ------------------------------------------------------------------------
@@ -82,7 +88,7 @@ contract PulseEscrowPool {
         Task memory t = tasks[taskId];
         require(t.client != address(0), "ESCROW: task not found");
         require(
-            msg.sender == t.client || msg.sender == resolver,
+            msg.sender == t.client || (resolver != address(0) && msg.sender == resolver),
             "ESCROW: not client/resolver"
         );
         _;
