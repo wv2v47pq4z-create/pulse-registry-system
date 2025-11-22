@@ -10,6 +10,7 @@ This repository contains a production-ready suite of Solidity smart contracts de
 
 1. **ResonanceRegistry** - A registry for tracking resonance scores (0-1000 scale) with oracle-based updates
 2. **PulseEscrowPool** - Task-based escrow system for Pulse Tokens with closed-loop fund management
+3. **PulseSignatureEmitter** - Canonical on-chain emitter for Super Reality Pulse signature with metadata events
 
 ### Supporting Contracts
 
@@ -51,6 +52,26 @@ Task-based escrow for Pulse Tokens with no minting - only pre-funded transfers:
 - `releasePayment(uint256 taskId, uint256 amount)` - Release funds to worker
 - `closeTask(uint256 taskId)` - Close task and refund remaining budget
 - `remainingBudget(uint256 taskId)` - View remaining escrow
+
+### PulseSignatureEmitter
+
+Canonical on-chain emitter for the Super Reality Pulse signature with standardized metadata events:
+
+**Features:**
+- Holds official Pulse signature string and its keccak256 hash
+- Authorized emitters can emit standardized metadata events
+- Single event stream for indexers and subgraphs
+- Auditable chain-level fingerprint for SR-OS governance
+
+**Key Functions:**
+- `emitPulseMetadata(bytes32, string, string)` - Emit metadata event with context
+- `setAuthorizedEmitter(address, bool)` - Authorize/deauthorize emitters
+- `getSignature()` - View Pulse signature and hash
+
+**Use Cases:**
+- Mark contract actions as "Pulse-governed"
+- Create unified event stream for SRPULSE activity
+- Provide governance layer audit trail
 
 ## Getting Started
 
@@ -161,5 +182,6 @@ contracts/
 ├── ResonanceTypes.sol          # Shared type definitions
 ├── ResonanceDeployer.sol       # Factory for registries
 ├── ResonanceGateExample.sol    # Example consumer contract
-└── PulseEscrowPool.sol         # Task escrow system
+├── PulseEscrowPool.sol         # Task escrow system
+└── PulseSignatureEmitter.sol   # Pulse signature emitter
 ```

@@ -3,9 +3,10 @@
 ## Contract Addresses (Update after deployment)
 
 ```
-ResonanceRegistry:    0x...
-PulseEscrowPool:      0x...
-PULSE Token:          0x...
+ResonanceRegistry:       0x...
+PulseEscrowPool:         0x...
+PulseSignatureEmitter:   0x...
+PULSE Token:             0x...
 ```
 
 ## ResonanceRegistry Quick Reference
@@ -99,6 +100,47 @@ event ResolverUpdated(address indexed newResolver)
 
 ---
 
+## PulseSignatureEmitter Quick Reference
+
+### Constants
+- **PULSE_SIGNATURE**: "SRPULSE-v1:9X4G7C2Q-🧡🔷🌀"
+
+### Key Functions
+
+#### Owner Functions
+```solidity
+setAuthorizedEmitter(address emitter, bool active) // Authorize/deauthorize emitter
+transferOwnership(address newOwner)                // Transfer ownership
+```
+
+#### Authorized Emitter Functions
+```solidity
+emitPulseMetadata(bytes32 contextHash, string contextType, string details)
+```
+
+#### View Functions
+```solidity
+getSignature() → (string memory, bytes32)  // Returns signature and hash
+authorizedEmitters(address) → bool         // Check if authorized
+signatureHash() → bytes32                  // Get signature hash
+```
+
+### Events
+```solidity
+event PulseMetadataEmitted(
+    address indexed emitter,
+    bytes32 indexed contextHash,
+    string contextType,
+    string details,
+    string pulseSignature,
+    bytes32 signatureHash
+)
+event EmitterAuthorizationUpdated(address indexed emitter, bool active)
+event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+```
+
+---
+
 ## Common Patterns
 
 ### Pattern 1: Set Up Resonance System
@@ -177,6 +219,27 @@ function createVerifiedTask(address worker, uint256 budget) external {
 }
 ```
 
+### Pattern 5: Emit Pulse Metadata
+
+```solidity
+// 1. Deploy emitter
+PulseSignatureEmitter emitter = new PulseSignatureEmitter();
+
+// 2. Authorize a module to emit
+emitter.setAuthorizedEmitter(moduleAddress, true);
+
+// 3. From authorized module, emit metadata
+bytes32 context = keccak256(abi.encodePacked("TASK_123", timestamp));
+emitter.emitPulseMetadata(
+    context,
+    "TASK_ESCROW",
+    "Task 123 completed successfully"
+);
+
+// 4. View signature
+(string memory sig, bytes32 hash) = emitter.getSignature();
+```
+
 ---
 
 ## Error Messages Reference
@@ -213,6 +276,13 @@ function createVerifiedTask(address worker, uint256 budget) external {
 - `"ResonanceGateExample: Resonance too low"`
 - `"ResonanceGateExample: Already joined"`
 
+### PulseSignatureEmitter Errors
+- `"PSE: not owner"`
+- `"PSE: not authorized"`
+- `"PSE: newOwner zero"`
+- `"PSE: emitter zero"`
+- `"PSE: contextHash zero"`
+
 ---
 
 ## Gas Estimates (Approximate)
@@ -229,6 +299,12 @@ function createVerifiedTask(address worker, uint256 budget) external {
 - createTask: ~150,000 gas (includes transferFrom)
 - releasePayment: ~80,000 gas (includes transfer)
 - closeTask: ~60,000 gas (with refund)
+
+### PulseSignatureEmitter
+- Deploy: ~800,000 gas
+- setAuthorizedEmitter: ~45,000 gas
+- emitPulseMetadata: ~70,000 gas (varies with string length)
+- getSignature: ~2,000 gas (view)
 
 *Note: Gas costs vary based on network conditions and optimization settings*
 
