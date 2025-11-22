@@ -3,10 +3,11 @@
 ## Contract Addresses (Update after deployment)
 
 ```
-ResonanceRegistry:       0x...
-PulseEscrowPool:         0x...
-PulseSignatureEmitter:   0x...
-PULSE Token:             0x...
+ResonanceRegistry:         0x...
+PulseEscrowPool:           0x...
+PulseSignatureEmitter:     0x...
+ResonanceClusterFactory:   0x...
+PULSE Token:               0x...
 ```
 
 ## ResonanceRegistry Quick Reference
@@ -141,6 +142,64 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 
 ---
 
+## ResonanceCluster Quick Reference
+
+### Key Functions
+
+#### Factory Functions (called on cluster)
+```solidity
+setClusterResonance(uint32 score, uint32 confidence, bytes32 contextHash)
+```
+
+#### View Functions
+```solidity
+getClusterState() → (uint32 score, uint32 confidence, uint64 updatedAt, bytes32 contextHash, uint256 updates)
+computeAggregateFromMembers() → (uint32 avgScore, uint32 avgConfidence, uint256 count)
+getMembers() → address[]
+memberCount() → uint256
+```
+
+### Events
+```solidity
+event ClusterUpdated(
+    uint32 score,
+    uint32 confidence,
+    uint64 updatedAt,
+    bytes32 contextHash,
+    uint256 updates
+)
+```
+
+---
+
+## ResonanceClusterFactory Quick Reference
+
+### Key Functions
+
+#### Owner Functions
+```solidity
+transferOwnership(address newOwner)
+```
+
+#### Public Functions
+```solidity
+getOrCreateCluster(address[] members) → address cluster
+```
+
+#### View Functions
+```solidity
+clusterByKey(bytes32) → address
+totalClusters() → uint256
+```
+
+### Events
+```solidity
+event ClusterCreated(address indexed cluster, bytes32 indexed clusterKey)
+event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
+```
+
+---
+
 ## Common Patterns
 
 ### Pattern 1: Set Up Resonance System
@@ -240,6 +299,32 @@ emitter.emitPulseMetadata(
 (string memory sig, bytes32 hash) = emitter.getSignature();
 ```
 
+### Pattern 6: Create Resonance Cluster
+
+```solidity
+// 1. Deploy factory
+ResonanceClusterFactory factory = new ResonanceClusterFactory();
+
+// 2. Create cluster when contracts interact
+address[] memory members = new address[](3);
+members[0] = resonanceContract1;
+members[1] = resonanceContract2;
+members[2] = resonanceContract3;
+
+address cluster = factory.getOrCreateCluster(members);
+
+// 3. Query cluster state
+ResonanceCluster c = ResonanceCluster(cluster);
+(uint32 score, uint32 confidence, , , ) = c.getClusterState();
+
+// 4. Compute aggregate from members
+(uint32 avgScore, uint32 avgConf, ) = c.computeAggregateFromMembers();
+
+// 5. Factory sets cluster resonance
+bytes32 ctx = keccak256("cluster-context");
+c.setClusterResonance(750, 900, ctx);
+```
+
 ---
 
 ## Error Messages Reference
@@ -283,6 +368,20 @@ emitter.emitPulseMetadata(
 - `"PSE: emitter zero"`
 - `"PSE: contextHash zero"`
 
+### ResonanceCluster Errors
+- `"CLUSTER: not factory"`
+- `"CLUSTER: factory zero"`
+- `"CLUSTER: need >= 2 members"`
+- `"CLUSTER: score > 1.000"`
+- `"CLUSTER: confidence > 1.000"`
+- `"CLUSTER: invalid member count"`
+
+### ResonanceClusterFactory Errors
+- `"FACTORY: not owner"`
+- `"FACTORY: newOwner zero"`
+- `"FACTORY: need >= 2 members"`
+- `"FACTORY: member zero"`
+
 ---
 
 ## Gas Estimates (Approximate)
@@ -305,6 +404,18 @@ emitter.emitPulseMetadata(
 - setAuthorizedEmitter: ~45,000 gas
 - emitPulseMetadata: ~70,000 gas (varies with string length)
 - getSignature: ~2,000 gas (view)
+
+### ResonanceClusterFactory
+- Deploy: ~600,000 gas
+- getOrCreateCluster (new): ~400,000+ gas (includes ResonanceCluster deployment)
+- getOrCreateCluster (existing): ~30,000 gas
+- totalClusters: ~2,000 gas (view)
+
+### ResonanceCluster
+- setClusterResonance: ~50,000 gas
+- computeAggregateFromMembers: ~50,000+ gas (depends on member count)
+- getClusterState: ~3,000 gas (view)
+- getMembers: ~3,000+ gas (view, depends on array size)
 
 *Note: Gas costs vary based on network conditions and optimization settings*
 

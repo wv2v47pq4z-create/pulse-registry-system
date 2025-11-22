@@ -11,10 +11,13 @@ This repository contains a production-ready suite of Solidity smart contracts de
 1. **ResonanceRegistry** - A registry for tracking resonance scores (0-1000 scale) with oracle-based updates
 2. **PulseEscrowPool** - Task-based escrow system for Pulse Tokens with closed-loop fund management
 3. **PulseSignatureEmitter** - Canonical on-chain emitter for Super Reality Pulse signature with metadata events
+4. **ResonanceCluster** - Aggregate resonance tracking for groups of interacting resonance contracts
+5. **ResonanceClusterFactory** - Factory for creating and managing resonance clusters
 
 ### Supporting Contracts
 
 - **IResonanceRegistry** - Interface for read-only access to resonance data
+- **IResonancePairView** - Interface for resonance contracts participating in clusters
 - **ResonanceTypes** - Shared type definitions for the resonance system
 - **ResonanceDeployer** - Factory contract for deploying new registries
 - **ResonanceGateExample** - Example consumer demonstrating resonance-gated access control
@@ -72,6 +75,43 @@ Canonical on-chain emitter for the Super Reality Pulse signature with standardiz
 - Mark contract actions as "Pulse-governed"
 - Create unified event stream for SRPULSE activity
 - Provide governance layer audit trail
+
+### ResonanceCluster
+
+"Resonance-of-resonances" contract representing groups of interacting resonance contracts:
+
+**Features:**
+- Tracks 2+ member resonance contracts
+- Aggregate cluster score and confidence (0-1000 scale)
+- Factory-owned for centralized management
+- Compute averages from member contracts
+- Metadata tracking with contextHash
+
+**Key Functions:**
+- `setClusterResonance(uint32, uint32, bytes32)` - Factory sets aggregate values
+- `computeAggregateFromMembers()` - Calculate average from all members
+- `getClusterState()` - View cluster score, confidence, and metadata
+- `getMembers()` - List all member contract addresses
+
+### ResonanceClusterFactory
+
+Factory for creating and managing resonance clusters when contracts interact:
+
+**Features:**
+- Unordered group tracking (same members = same cluster)
+- Automatic cluster creation or reuse
+- Sorted address-based cluster keys
+- Owner-controlled factory
+
+**Key Functions:**
+- `getOrCreateCluster(address[])` - Get existing or create new cluster
+- `clusterByKey(bytes32)` - Look up cluster by key
+- `totalClusters()` - View total number of clusters
+
+**Use Cases:**
+- Track resonance when multiple contracts interact
+- Aggregate reputation scores across contract groups
+- Create hierarchical resonance networks
 
 ## Getting Started
 
@@ -183,5 +223,6 @@ contracts/
 ├── ResonanceDeployer.sol       # Factory for registries
 ├── ResonanceGateExample.sol    # Example consumer contract
 ├── PulseEscrowPool.sol         # Task escrow system
-└── PulseSignatureEmitter.sol   # Pulse signature emitter
+├── PulseSignatureEmitter.sol   # Pulse signature emitter
+└── ResonanceCluster.sol        # Cluster contracts + factory
 ```
