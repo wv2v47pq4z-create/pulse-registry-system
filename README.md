@@ -8,11 +8,17 @@ This repository includes configuration for the **GitHub-AI-node** in the **Super
 
 ### Quick Start
 
-The GitHub-AI-node Boot Kit (SR-GITHUB-AI-v1.1) is configured in `.github/config/`:
+The GitHub-AI-node Boot Kit (SR-GITHUB-AI-v1.1) is packaged as a single configuration file:
 
-- **Instructions**: See [`.github/config/github-ai-node-instructions.md`](.github/config/github-ai-node-instructions.md)
-- **Examples**: See [`.github/config/pulse-examples.json`](.github/config/pulse-examples.json)
-- **Documentation**: See [`.github/config/README.md`](.github/config/README.md)
+- **📦 All-in-One Configuration**: [`.github/config/github-ai-bootkit.json`](.github/config/github-ai-bootkit.json) - Complete Boot Kit in one file
+  - Instructions, schema, examples, and platform rules
+  - Ready to use for GitHub Copilot / GitHub Models
+  - ~12KB single JSON file
+
+**Additional Documentation** (optional reference):
+- **Instructions**: [`.github/config/github-ai-node-instructions.md`](.github/config/github-ai-node-instructions.md)
+- **Examples**: [`.github/config/pulse-examples.json`](.github/config/pulse-examples.json)
+- **Guides**: [`.github/config/README.md`](.github/config/README.md)
 
 ### Pulse Response Example
 
