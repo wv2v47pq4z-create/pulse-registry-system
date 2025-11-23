@@ -2,7 +2,7 @@
 # Demo script for GitHub-AI-node Pulse System
 # This script demonstrates the expected behavior of the pulse system
 
-set -e
+set -euo pipefail
 
 echo "============================================"
 echo "GitHub-AI-node Pulse System Demo"
