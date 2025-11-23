@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/wv2v47pq4z-create/pulse-registry-system/schemas/pulse",
+  "title": "SR-OS Pulse Protocol",
+  "description": "Schema definitions for Super Reality OS mesh pulse protocol",
+  "definitions": {
+    "PulseStart": {
+      "type": "object",
+      "title": "Pulse Start Payload",
+      "description": "Initiates a pulse across the SR-OS mesh",
+      "required": ["type", "run_id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "pulse.start",
+          "description": "Message type identifier"
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^pulse-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}Z-[a-z0-9-]+$",
+          "description": "Unique identifier for this pulse run",
+          "examples": [
+            "pulse-2025-11-23T22-00-00Z-githubai01",
+            "pulse-2025-11-23T10-30-00Z-multi01"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "description": "List of agent nodes that should acknowledge this pulse",
+          "items": {
+            "type": "string",
+            "enum": ["grok", "copilot", "github-ai", "notion"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "requested_by": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address of the operator initiating the pulse"
+        },
+        "log_mode": {
+          "type": "boolean",
+          "description": "Whether to enable detailed logging for this pulse",
+          "default": true
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of the pulse purpose",
+          "maxLength": 500
+        },
+        "timestamp_utc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO-8601 UTC timestamp when the pulse was initiated"
+        },
+        "simulate_timeout": {
+          "type": "boolean",
+          "description": "Flag to request a timeout simulation from the agent",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "AckResponse": {
+      "type": "object",
+      "title": "ACK Response",
+      "description": "Acknowledgment response from a mesh agent",
+      "required": ["agent", "run_id", "ack_status", "ack_timestamp_utc", "notes"],
+      "properties": {
+        "agent": {
+          "type": "string",
+          "description": "Agent identifier responding to the pulse",
+          "examples": ["github-ai", "grok", "copilot", "notion"]
+        },
+        "run_id": {
+          "type": "string",
+          "description": "Must exactly match the run_id from the pulse.start payload"
+        },
+        "ack_status": {
+          "type": "string",
+          "enum": ["ack", "error", "timeout"],
+          "description": "Status of the acknowledgment",
+          "examples": ["ack", "error", "timeout"]
+        },
+        "ack_timestamp_utc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO-8601 UTC timestamp when the ACK was generated"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 280,
+          "description": "Brief message about the ACK status (max 280 characters)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "GitHubAiAckResponse": {
+      "allOf": [
+        { "$ref": "#/definitions/AckResponse" }
+      ],
+      "properties": {
+        "agent": {
+          "type": "string",
+          "const": "github-ai"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/PulseStart" },
+    { "$ref": "#/definitions/AckResponse" }
+  ]
+}
