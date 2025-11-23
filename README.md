@@ -8,12 +8,12 @@ This repository includes configuration for the **GitHub-AI-node** in the **Super
 
 ### Quick Start
 
-The GitHub-AI-node Boot Kit (SR-GITHUB-AI-v1.1) is packaged as a single configuration file:
+The GitHub-AI-node Boot Kit (SR-GITHUB-AI-v1.1) is available in multiple formats:
 
-- **📦 All-in-One Configuration**: [`.github/config/github-ai-bootkit.json`](.github/config/github-ai-bootkit.json) - Complete Boot Kit in one file
-  - Instructions, schema, examples, and platform rules
-  - Ready to use for GitHub Copilot / GitHub Models
-  - ~12KB single JSON file
+**Packaged Formats:**
+- **🎯 Master Prompt**: [`.github/config/MASTER-PROMPT.md`](.github/config/MASTER-PROMPT.md) - Concise system prompt (~3KB) optimized for pasting into Notion AI or other AI platforms
+- **📄 Full Documentation**: [`.github/config/NOTION-PAGE.md`](.github/config/NOTION-PAGE.md) - Complete single-page documentation (~11KB) for Notion
+- **📦 JSON Config**: [`.github/config/github-ai-bootkit.json`](.github/config/github-ai-bootkit.json) - Machine-readable configuration (~9KB)
 
 **Additional Documentation** (optional reference):
 - **Instructions**: [`.github/config/github-ai-node-instructions.md`](.github/config/github-ai-node-instructions.md)
@@ -53,6 +53,7 @@ The GitHub-AI-node responds with:
 ```
 .github/
   config/
+    MASTER-PROMPT.md                 # 🎯 Master prompt for Notion AI (concise)
     NOTION-PAGE.md                   # ⭐ Single page for Notion (all-in-one)
     github-ai-bootkit.json           # ⭐ Single JSON config (packaged)
     github-ai-node-instructions.md   # Boot Kit instructions (detailed)
