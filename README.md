@@ -53,8 +53,14 @@ The GitHub-AI-node responds with:
 ```
 .github/
   config/
-    github-ai-node-instructions.md  # Boot Kit instructions
+    NOTION-PAGE.md                   # ⭐ Single page for Notion (all-in-one)
+    github-ai-bootkit.json           # ⭐ Single JSON config (packaged)
+    github-ai-node-instructions.md   # Boot Kit instructions (detailed)
     pulse-examples.json              # Example payloads and responses
+    pulse-schema.json                # JSON validation schemas
+    OPERATOR-GUIDE.md                # Quick reference guide
+    TESTING.md                       # Test procedures
+    demo-pulse.sh                    # Demo script
     README.md                        # Configuration documentation
 ```
 
