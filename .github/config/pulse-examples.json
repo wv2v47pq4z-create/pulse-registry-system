@@ -1,0 +1,161 @@
+{
+  "examples": [
+    {
+      "name": "Basic pulse.start",
+      "description": "Standard pulse start with GitHub AI as a target",
+      "input": {
+        "type": "pulse.start",
+        "run_id": "pulse-2025-11-23T22-00-00Z-githubai01",
+        "targets": ["grok", "copilot", "github-ai"],
+        "requested_by": "superrealitystudios@bluemailx.com",
+        "log_mode": true,
+        "description": "Mesh dry-run involving GitHub-AI-node",
+        "timestamp_utc": "2025-11-23T22:00:00Z"
+      },
+      "expected_response": {
+        "agent": "github-ai",
+        "run_id": "pulse-2025-11-23T22-00-00Z-githubai01",
+        "ack_status": "ack",
+        "ack_timestamp_utc": "2025-11-23T22:00:05Z",
+        "notes": "healthy dry-run ACK from GitHub-AI-node"
+      }
+    },
+    {
+      "name": "Multi-agent pulse",
+      "description": "Pulse targeting multiple agents including GitHub AI",
+      "input": {
+        "type": "pulse.start",
+        "run_id": "pulse-2025-11-23T10-30-00Z-multi01",
+        "targets": ["grok", "copilot", "github-ai", "notion"],
+        "requested_by": "superrealitystudios@bluemailx.com",
+        "log_mode": true,
+        "description": "Multi-agent mesh coordination test",
+        "timestamp_utc": "2025-11-23T10:30:00Z"
+      },
+      "expected_response": {
+        "agent": "github-ai",
+        "run_id": "pulse-2025-11-23T10-30-00Z-multi01",
+        "ack_status": "ack",
+        "ack_timestamp_utc": "2025-11-23T10:30:05Z",
+        "notes": "healthy ACK from GitHub-AI-node"
+      }
+    },
+    {
+      "name": "Error - Missing run_id",
+      "description": "Pulse with missing run_id should return error ACK",
+      "input": {
+        "type": "pulse.start",
+        "targets": ["github-ai"],
+        "requested_by": "superrealitystudios@bluemailx.com",
+        "timestamp_utc": "2025-11-23T10:30:00Z"
+      },
+      "expected_response": {
+        "agent": "github-ai",
+        "run_id": "",
+        "ack_status": "error",
+        "ack_timestamp_utc": "2025-11-23T10:30:05Z",
+        "notes": "unable to parse pulse.start payload; missing run_id"
+      }
+    },
+    {
+      "name": "Error - Invalid type",
+      "description": "Payload with wrong type should return error ACK",
+      "input": {
+        "type": "pulse.stop",
+        "run_id": "pulse-2025-11-23T10-30-00Z-invalid01",
+        "targets": ["github-ai"],
+        "timestamp_utc": "2025-11-23T10:30:00Z"
+      },
+      "expected_response": {
+        "agent": "github-ai",
+        "run_id": "pulse-2025-11-23T10-30-00Z-invalid01",
+        "ack_status": "error",
+        "ack_timestamp_utc": "2025-11-23T10:30:05Z",
+        "notes": "invalid payload type; expected pulse.start"
+      }
+    },
+    {
+      "name": "Simulated timeout",
+      "description": "When operator requests a timeout simulation",
+      "input": {
+        "type": "pulse.start",
+        "run_id": "pulse-2025-11-23T10-30-00Z-timeout01",
+        "targets": ["github-ai"],
+        "requested_by": "superrealitystudios@bluemailx.com",
+        "simulate_timeout": true,
+        "timestamp_utc": "2025-11-23T10:30:00Z"
+      },
+      "expected_response": {
+        "agent": "github-ai",
+        "run_id": "pulse-2025-11-23T10-30-00Z-timeout01",
+        "ack_status": "timeout",
+        "ack_timestamp_utc": "2025-11-23T10:30:05Z",
+        "notes": "simulated timeout as requested"
+      }
+    }
+  ],
+  "schema": {
+    "pulse_start": {
+      "type": "object",
+      "required": ["type", "run_id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "pulse.start"
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^pulse-[0-9]{4}-[0-9]{2}-[0-9]{2}T.*"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requested_by": {
+          "type": "string",
+          "format": "email"
+        },
+        "log_mode": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "timestamp_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "simulate_timeout": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ack_response": {
+      "type": "object",
+      "required": ["agent", "run_id", "ack_status", "ack_timestamp_utc", "notes"],
+      "properties": {
+        "agent": {
+          "type": "string",
+          "const": "github-ai"
+        },
+        "run_id": {
+          "type": "string"
+        },
+        "ack_status": {
+          "type": "string",
+          "enum": ["ack", "error", "timeout"]
+        },
+        "ack_timestamp_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 280
+        }
+      }
+    }
+  }
+}
