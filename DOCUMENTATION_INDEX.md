@@ -7,6 +7,19 @@ This repository contains the smart contract ecosystem for PulseRegistry and Zcas
 
 ## Core Documentation
 
+### 🤖 [.copilot-instructions.md](./.copilot-instructions.md) ⭐ NEW
+**GitHub Copilot instructions for generating Perplexity AI prompts**
+
+This file provides a structured framework for using GitHub Copilot Chat to generate optimized prompts for Perplexity AI:
+- 7-section prompt structure (Role, Goals, Inputs, Constraints, Output Format, Autonomy, Task-specific)
+- Behavior rules for clean, copy-pastable output
+- Repository-specific guidance for Pulse Registry System
+- Usage examples and references
+
+**Use this file**: When you need GitHub Copilot to help you create well-structured prompts for Perplexity AI. Copilot will automatically load these instructions in Chat.
+
+---
+
 ### 🗄️ [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)
 **Normalized database schema for projects, automations, and integrations**
 
@@ -215,12 +228,13 @@ This detailed document serves as a complete knowledge base:
 
 | Document | Version | Last Updated | Status |
 |----------|---------|--------------|--------|
+| .copilot-instructions.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | PERPLEXITY_AI_MASTER_PROMPT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | DATABASE_SCHEMA.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | database_examples.json | 1.0.0 | 2025-11-24 | ✅ Complete |
 | ACCOUNT_DATA_AUDIT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | PERPLEXITY_MASTER_PROMPT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
-| DOCUMENTATION_INDEX.md | 1.2.0 | 2025-11-24 | ✅ Complete |
+| DOCUMENTATION_INDEX.md | 1.3.0 | 2025-11-24 | ✅ Complete |
 
 ---
 

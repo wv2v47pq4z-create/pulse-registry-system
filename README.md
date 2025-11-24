@@ -15,6 +15,7 @@ The Pulse Registry System is a blockchain-based ecosystem that provides:
 Comprehensive documentation is available:
 
 - **[Documentation Index](./DOCUMENTATION_INDEX.md)** - Start here for navigation
+- **[Copilot Instructions](./.copilot-instructions.md)** 🤖 - GitHub Copilot prompt generator for Perplexity AI
 - **[Perplexity AI Master Prompt](./PERPLEXITY_AI_MASTER_PROMPT.md)** ⭐ - Single consolidated prompt optimized for Perplexity AI
 - **[Database Schema](./DATABASE_SCHEMA.md)** - Normalized database architecture for projects, automations, and integrations
 - **[Account Data Audit](./ACCOUNT_DATA_AUDIT.md)** - Complete blockchain data structure specifications and security analysis
