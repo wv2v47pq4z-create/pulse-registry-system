@@ -13,3 +13,20 @@ states/
 # Optional
 .env
 .env.local
+
+# Node modules
+node_modules/
+
+# Hardhat
+cache/
+artifacts/
+
+# Coverage
+coverage/
+coverage.json
+
+# TypeScript
+*.tsbuildinfo
+
+# Build info
+*.build-info.json
