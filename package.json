@@ -26,9 +26,9 @@
     "chai": "^4.3.10",
     "ethereum-waffle": "^4.0.10",
     "ethers": "^5.7.2",
-    "hardhat": "^2.19.0"
+    "hardhat": "^2.19.0",
+    "solc": "^0.8.19"
   },
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/wv2v47pq4z-create/pulse-registry-system.git"
