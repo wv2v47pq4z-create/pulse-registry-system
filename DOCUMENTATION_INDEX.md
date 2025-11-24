@@ -7,6 +7,35 @@ This repository contains the smart contract ecosystem for PulseRegistry and Zcas
 
 ## Core Documentation
 
+### 🗄️ [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md)
+**Normalized database schema for projects, automations, and integrations**
+
+This document provides:
+- Complete entity relationship model with 12 core tables
+- SQL schema definitions for PostgreSQL
+- Natural language prompt for database architects
+- Comprehensive JSON examples for all entities
+- Database indexes and optimization strategies
+- Migration strategy and maintenance procedures
+
+**Key Sections**:
+- Projects, Tasks, Agents, Automations, Integrations, Branding
+- Junction tables for many-to-many relationships
+- Activity logs and audit trails
+- Database views for common queries
+- Backup and maintenance strategies
+
+**Use this document when**:
+- Designing the database architecture
+- Implementing data models
+- Planning automation workflows
+- Integrating external services
+- Training AI systems on the data structure
+
+**Companion File**: [database_examples.json](./database_examples.json) - Complete JSON examples
+
+---
+
 ### 📋 [ACCOUNT_DATA_AUDIT.md](./ACCOUNT_DATA_AUDIT.md)
 **Complete audit of all account data structures and security analysis**
 
@@ -95,11 +124,14 @@ This document serves as a complete knowledge base:
 
 ### For AI Systems (Perplexity, ChatGPT, Claude, etc.)
 1. Ingest [PERPLEXITY_MASTER_PROMPT.md](./PERPLEXITY_MASTER_PROMPT.md) completely
-2. Reference [ACCOUNT_DATA_AUDIT.md](./ACCOUNT_DATA_AUDIT.md) for detailed data specifications
-3. Use both documents to answer questions about:
+2. Reference [ACCOUNT_DATA_AUDIT.md](./ACCOUNT_DATA_AUDIT.md) for blockchain data specifications
+3. Review [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) for project and automation data models
+4. Use [database_examples.json](./database_examples.json) for concrete JSON examples
+5. Use all documents to answer questions about:
    - System architecture and design
-   - Smart contract implementation
-   - Integration patterns
+   - Smart contract and blockchain implementation
+   - Database design and data models
+   - Integration patterns and automations
    - Security and privacy considerations
    - User workflows and use cases
 
@@ -113,20 +145,20 @@ This document serves as a complete knowledge base:
 │   (This file - Navigation Hub)      │
 └──────────┬──────────────────────────┘
            │
-           ├──────────────────┬─────────────────┐
-           │                  │                 │
-           ▼                  ▼                 ▼
-┌──────────────────┐  ┌──────────────┐  ┌─────────────────┐
-│ ACCOUNT_DATA     │  │ PERPLEXITY   │  │ README.md       │
-│ AUDIT.md         │  │ MASTER       │  │ (Project Intro) │
-│                  │  │ PROMPT.md    │  │                 │
-│ • Data Structures│  │              │  │ • Overview      │
-│ • Security       │  │ • Full System│  │ • Quick Desc    │
-│ • Compliance     │  │ • Architecture│  │                 │
-│ • Technical Spec │  │ • Workflows  │  │                 │
-└──────────────────┘  │ • API Docs   │  └─────────────────┘
-                      │ • Integration│
-                      └──────────────┘
+           ├──────────────────┬─────────────────┬─────────────────┐
+           │                  │                 │                 │
+           ▼                  ▼                 ▼                 ▼
+┌──────────────────┐  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐
+│ DATABASE_SCHEMA  │  │ ACCOUNT_DATA │  │ PERPLEXITY   │  │ README.md       │
+│ .md              │  │ AUDIT.md     │  │ MASTER       │  │ (Project Intro) │
+│                  │  │              │  │ PROMPT.md    │  │                 │
+│ • Entity Model   │  │ • Blockchain │  │              │  │ • Overview      │
+│ • SQL Schema     │  │   Data       │  │ • Full System│  │ • Quick Start   │
+│ • Automations    │  │ • Security   │  │ • Workflows  │  │                 │
+│ • Integrations   │  │ • Compliance │  │ • API Docs   │  │                 │
+└────────┬─────────┘  └──────────────┘  └──────────────┘  └─────────────────┘
+         │
+         └─────► database_examples.json (JSON samples)
 ```
 
 ---
@@ -164,9 +196,11 @@ This document serves as a complete knowledge base:
 
 | Document | Version | Last Updated | Status |
 |----------|---------|--------------|--------|
+| DATABASE_SCHEMA.md | 1.0.0 | 2025-11-24 | ✅ Complete |
+| database_examples.json | 1.0.0 | 2025-11-24 | ✅ Complete |
 | ACCOUNT_DATA_AUDIT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | PERPLEXITY_MASTER_PROMPT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
-| DOCUMENTATION_INDEX.md | 1.0.0 | 2025-11-24 | ✅ Complete |
+| DOCUMENTATION_INDEX.md | 1.1.0 | 2025-11-24 | ✅ Complete |
 
 ---
 

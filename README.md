@@ -15,8 +15,10 @@ The Pulse Registry System is a blockchain-based ecosystem that provides:
 Comprehensive documentation is available:
 
 - **[Documentation Index](./DOCUMENTATION_INDEX.md)** - Start here for navigation
-- **[Account Data Audit](./ACCOUNT_DATA_AUDIT.md)** - Complete data structure specifications and security analysis
+- **[Database Schema](./DATABASE_SCHEMA.md)** - Normalized database architecture for projects, automations, and integrations
+- **[Account Data Audit](./ACCOUNT_DATA_AUDIT.md)** - Complete blockchain data structure specifications and security analysis
 - **[Perplexity Master Prompt](./PERPLEXITY_MASTER_PROMPT.md)** - Full system documentation for AI ingestion
+- **[Database Examples](./database_examples.json)** - Complete JSON examples for all entities
 
 ### Quick Links
 

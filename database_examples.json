@@ -1,0 +1,611 @@
+{
+  "database_schema_examples": {
+    "version": "1.0.0",
+    "last_updated": "2025-11-24T12:17:00Z",
+    "description": "Complete JSON examples for the Pulse Registry System database schema",
+    
+    "projects": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Super Reality AI",
+        "description": "AI-powered virtual reality platform with blockchain integration for immersive experiences",
+        "project_type": "smart_contract",
+        "status": "active",
+        "priority": 3,
+        "owner_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+        "repository_url": "https://github.com/super-reality/ai-platform",
+        "documentation_url": "https://docs.superreality.ai",
+        "branding_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        "created_at": "2025-01-15T10:30:00Z",
+        "updated_at": "2025-11-24T12:17:00Z",
+        "completed_at": null,
+        "metadata": {
+          "tech_stack": ["Solidity", "React", "Node.js", "IPFS"],
+          "budget": 250000,
+          "team_size": 8,
+          "target_chains": ["Pulse", "Zcash"]
+        }
+      },
+      {
+        "id": "661f9511-f3ac-52e5-b827-557766551111",
+        "name": "Pulse Registry System",
+        "description": "Smart contracts for PulseRegistry and ZcashBridge - auto-registration and interoperability layer",
+        "project_type": "smart_contract",
+        "status": "active",
+        "priority": 3,
+        "owner_id": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "repository_url": "https://github.com/wv2v47pq4z-create/pulse-registry-system",
+        "documentation_url": "https://github.com/wv2v47pq4z-create/pulse-registry-system/blob/main/PERPLEXITY_MASTER_PROMPT.md",
+        "branding_id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        "created_at": "2025-11-01T09:00:00Z",
+        "updated_at": "2025-11-24T12:17:00Z",
+        "completed_at": null,
+        "metadata": {
+          "tech_stack": ["Solidity", "Web3.js"],
+          "blockchain": "Pulse",
+          "bridge_to": "Zcash"
+        }
+      }
+    ],
+    
+    "tasks": [
+      {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "project_id": "550e8400-e29b-41d4-a716-446655440000",
+        "parent_task_id": null,
+        "name": "Implement multi-signature wallet for bridge contract",
+        "description": "Add multi-sig functionality to ZcashBridge contract for enhanced security on high-value transfers. Requires 3 of 5 validator signatures for transactions over 10,000 tokens.",
+        "task_type": "feature",
+        "status": "in_progress",
+        "priority": 2,
+        "assignee_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+        "estimated_hours": 16.0,
+        "actual_hours": 8.5,
+        "due_date": "2025-12-01T17:00:00Z",
+        "created_at": "2025-11-20T08:00:00Z",
+        "updated_at": "2025-11-24T12:00:00Z",
+        "completed_at": null,
+        "tags": ["security", "smart-contract", "bridge", "high-priority"],
+        "metadata": {
+          "github_issue": "https://github.com/super-reality/ai-platform/issues/42",
+          "security_review": true,
+          "requires_audit": true,
+          "blockers": []
+        }
+      },
+      {
+        "id": "234e5678-f90c-23e4-b567-537725285222",
+        "project_id": "661f9511-f3ac-52e5-b827-557766551111",
+        "parent_task_id": null,
+        "name": "Audit all account data and create master prompt for Perplexity AI",
+        "description": "Create comprehensive documentation of all account data structures and master prompt for AI ingestion",
+        "task_type": "documentation",
+        "status": "completed",
+        "priority": 2,
+        "assignee_id": "copilot-agent-001",
+        "estimated_hours": 4.0,
+        "actual_hours": 3.5,
+        "due_date": "2025-11-24T18:00:00Z",
+        "created_at": "2025-11-24T12:11:00Z",
+        "updated_at": "2025-11-24T12:17:00Z",
+        "completed_at": "2025-11-24T12:17:00Z",
+        "tags": ["documentation", "audit", "ai", "perplexity"],
+        "metadata": {
+          "deliverables": [
+            "ACCOUNT_DATA_AUDIT.md",
+            "PERPLEXITY_MASTER_PROMPT.md",
+            "DOCUMENTATION_INDEX.md"
+          ]
+        }
+      }
+    ],
+    
+    "agents": [
+      {
+        "id": "33344444-aaaa-bbbb-cccc-123456789012",
+        "name": "Spark",
+        "agent_type": "preview",
+        "description": "AI-powered code preview and analysis agent for pull requests with focus on security and best practices",
+        "status": "active",
+        "capabilities": [
+          "code_review",
+          "security_analysis",
+          "performance_optimization",
+          "documentation_generation",
+          "test_coverage_analysis"
+        ],
+        "configuration": {
+          "model": "gpt-4",
+          "temperature": 0.3,
+          "max_tokens": 4000,
+          "languages": ["solidity", "javascript", "python", "typescript"],
+          "review_checklist": ["security", "gas_optimization", "best_practices", "documentation"]
+        },
+        "api_endpoint": "https://api.superreality.ai/agents/spark",
+        "version": "2.4.1",
+        "created_at": "2025-06-01T12:00:00Z",
+        "updated_at": "2025-11-24T09:30:00Z",
+        "last_active_at": "2025-11-24T12:15:00Z",
+        "metadata": {
+          "reviews_completed": 1247,
+          "average_review_time_seconds": 45,
+          "accuracy_score": 0.94,
+          "false_positive_rate": 0.08
+        }
+      },
+      {
+        "id": "44455555-bbbb-cccc-dddd-234567890123",
+        "name": "CodeQL Security Scanner",
+        "agent_type": "validator",
+        "description": "Automated security vulnerability detection using CodeQL static analysis",
+        "status": "active",
+        "capabilities": [
+          "vulnerability_detection",
+          "cwe_classification",
+          "severity_assessment",
+          "remediation_suggestions"
+        ],
+        "configuration": {
+          "languages": ["javascript", "typescript", "python", "solidity"],
+          "severity_threshold": "medium",
+          "auto_fix": false
+        },
+        "api_endpoint": "https://api.superreality.ai/agents/codeql",
+        "version": "2.14.6",
+        "created_at": "2025-05-15T10:00:00Z",
+        "updated_at": "2025-11-20T08:00:00Z",
+        "last_active_at": "2025-11-24T11:30:00Z",
+        "metadata": {
+          "scans_completed": 892,
+          "vulnerabilities_found": 47,
+          "critical_vulnerabilities": 3
+        }
+      },
+      {
+        "id": "copilot-agent-001",
+        "name": "GitHub Copilot Agent",
+        "agent_type": "copilot",
+        "description": "AI coding assistant for development tasks including implementation, documentation, and testing",
+        "status": "active",
+        "capabilities": [
+          "code_generation",
+          "documentation_writing",
+          "test_creation",
+          "refactoring",
+          "debugging"
+        ],
+        "configuration": {
+          "model": "gpt-4-turbo",
+          "context_window": 128000,
+          "languages": ["all"]
+        },
+        "api_endpoint": "https://api.github.com/copilot",
+        "version": "1.0.0",
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-11-24T12:17:00Z",
+        "last_active_at": "2025-11-24T12:17:00Z",
+        "metadata": {
+          "tasks_completed": 156,
+          "lines_of_code_generated": 45892
+        }
+      }
+    ],
+    
+    "agent_assignments": [
+      {
+        "id": "cc1e4567-e89b-12d3-a456-426614174003",
+        "agent_id": "33344444-aaaa-bbbb-cccc-123456789012",
+        "project_id": "550e8400-e29b-41d4-a716-446655440000",
+        "role": "reviewer",
+        "assigned_at": "2025-06-15T14:00:00Z",
+        "assigned_by": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "status": "active",
+        "metadata": {
+          "auto_review_enabled": true,
+          "review_threshold": "all_prs",
+          "notification_channel": "slack"
+        }
+      },
+      {
+        "id": "dd2e5678-f90c-23e4-b567-426614174004",
+        "agent_id": "44455555-bbbb-cccc-dddd-234567890123",
+        "project_id": "550e8400-e29b-41d4-a716-446655440000",
+        "role": "validator",
+        "assigned_at": "2025-06-15T14:30:00Z",
+        "assigned_by": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "status": "active",
+        "metadata": {
+          "scan_frequency": "on_commit",
+          "auto_block_critical": true
+        }
+      }
+    ],
+    
+    "automations": [
+      {
+        "id": "444e5678-f12c-34d5-b678-537725285111",
+        "name": "Weekly Security Audit",
+        "automation_type": "audit",
+        "description": "Automated security scan of all smart contracts and dependencies, including vulnerability assessment and dependency checks",
+        "script_name": "weekly_audit_script",
+        "script_path": "/automations/security/weekly_audit.js",
+        "related_project_id": "550e8400-e29b-41d4-a716-446655440000",
+        "trigger_type": "schedule",
+        "trigger_config": {
+          "cron": "0 2 * * 1",
+          "timezone": "UTC",
+          "description": "Every Monday at 2 AM UTC"
+        },
+        "status": "active",
+        "last_run_at": "2025-11-18T02:00:15Z",
+        "next_run_at": "2025-11-25T02:00:00Z",
+        "run_count": 87,
+        "success_count": 84,
+        "failure_count": 3,
+        "created_at": "2025-03-01T10:00:00Z",
+        "updated_at": "2025-11-18T02:05:30Z",
+        "created_by": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "metadata": {
+          "notification_channels": ["slack", "email"],
+          "alert_on_failure": true,
+          "slack_webhook": "https://hooks.slack.com/services/...",
+          "email_recipients": ["security@superreality.ai"]
+        }
+      },
+      {
+        "id": "888e9012-j56g-78h9-f012-971169629555",
+        "name": "n8n Blockchain Data Sync",
+        "automation_type": "data_sync",
+        "description": "Syncs blockchain data to analytics database via n8n workflow for real-time dashboards and reporting",
+        "script_name": "n8n_blockchain_sync",
+        "script_path": "https://n8n.superreality.ai/workflow/42",
+        "related_project_id": "550e8400-e29b-41d4-a716-446655440000",
+        "trigger_type": "event",
+        "trigger_config": {
+          "event_name": "BlockMined",
+          "source": "pulse_chain",
+          "filter": {
+            "contract_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb"
+          }
+        },
+        "status": "active",
+        "last_run_at": "2025-11-24T12:10:30Z",
+        "next_run_at": null,
+        "run_count": 15847,
+        "success_count": 15821,
+        "failure_count": 26,
+        "created_at": "2025-07-01T12:00:00Z",
+        "updated_at": "2025-11-24T12:11:00Z",
+        "created_by": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "metadata": {
+          "n8n_workflow_id": "42",
+          "n8n_version": "1.17.0",
+          "average_execution_time_ms": 850,
+          "data_points_synced": 458923,
+          "database": "postgresql://analytics.superreality.ai/blockchain"
+        }
+      },
+      {
+        "id": "999f0123-k67h-89i0-g123-082270740666",
+        "name": "Daily Backup and Archive",
+        "automation_type": "monitoring",
+        "description": "Creates daily backups of database and archives logs to S3-compatible storage",
+        "script_name": "daily_backup.sh",
+        "script_path": "/automations/backup/daily_backup.sh",
+        "related_project_id": null,
+        "trigger_type": "schedule",
+        "trigger_config": {
+          "cron": "0 3 * * *",
+          "timezone": "UTC",
+          "description": "Every day at 3 AM UTC"
+        },
+        "status": "active",
+        "last_run_at": "2025-11-24T03:00:00Z",
+        "next_run_at": "2025-11-25T03:00:00Z",
+        "run_count": 328,
+        "success_count": 327,
+        "failure_count": 1,
+        "created_at": "2025-01-01T00:00:00Z",
+        "updated_at": "2025-11-24T03:15:00Z",
+        "created_by": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "metadata": {
+          "backup_location": "s3://backups.superreality.ai/",
+          "retention_days": 30,
+          "compression": "gzip"
+        }
+      }
+    ],
+    
+    "automation_runs": [
+      {
+        "id": "555e6789-g23d-45e6-c789-648836396222",
+        "automation_id": "444e5678-f12c-34d5-b678-537725285111",
+        "status": "success",
+        "started_at": "2025-11-18T02:00:15Z",
+        "completed_at": "2025-11-18T02:05:28Z",
+        "duration_seconds": 313,
+        "trigger_source": "schedule",
+        "output_log": "Scanned 15 contracts. Found 0 critical issues, 2 warnings.\nWarning 1: Consider using SafeMath in contract PulseRegistry.sol\nWarning 2: Gas optimization opportunity in ZcashBridge.sol line 142",
+        "error_log": null,
+        "metrics": {
+          "contracts_scanned": 15,
+          "vulnerabilities_found": 0,
+          "warnings": 2,
+          "dependencies_checked": 234,
+          "outdated_dependencies": 3
+        },
+        "metadata": {
+          "codeql_version": "2.14.6",
+          "scan_type": "full",
+          "report_url": "https://reports.superreality.ai/security/2025-11-18"
+        }
+      }
+    ],
+    
+    "integrations": [
+      {
+        "id": "666e7890-h34e-56f7-d890-759947407333",
+        "name": "TikTok Creator Portal",
+        "integration_type": "social_media",
+        "service_name": "TikTok",
+        "description": "Integration for posting content and analytics from Super Reality platform to TikTok creator account",
+        "status": "enabled",
+        "configuration": {
+          "api_key": "encrypted_tiktok_key_abc123",
+          "api_secret": "encrypted_tiktok_secret_xyz789",
+          "account_id": "superrealityai",
+          "rate_limit": 100,
+          "rate_limit_window": "hour",
+          "endpoints": {
+            "post": "https://open-api.tiktok.com/v1/post/",
+            "analytics": "https://open-api.tiktok.com/v1/analytics/",
+            "user": "https://open-api.tiktok.com/v1/user/"
+          }
+        },
+        "health_status": "healthy",
+        "last_run_at": "2025-11-24T11:45:00Z",
+        "last_success_at": "2025-11-24T11:45:00Z",
+        "last_error_at": "2025-11-20T08:30:00Z",
+        "last_error_message": "Rate limit exceeded (100 requests/hour), retrying with exponential backoff",
+        "run_count": 2847,
+        "success_count": 2839,
+        "failure_count": 8,
+        "created_at": "2025-05-10T15:00:00Z",
+        "updated_at": "2025-11-24T11:45:05Z",
+        "metadata": {
+          "auto_retry": true,
+          "retry_attempts": 3,
+          "success_rate": 0.997,
+          "average_response_time_ms": 1247
+        }
+      },
+      {
+        "id": "777e8901-i45f-67g8-e901-860058518444",
+        "name": "IPFS Content Storage",
+        "integration_type": "storage",
+        "service_name": "IPFS",
+        "description": "Decentralized storage for metadata, images, and content using IPFS protocol",
+        "status": "enabled",
+        "configuration": {
+          "gateway": "https://ipfs.superreality.ai",
+          "api_endpoint": "https://api.ipfs.superreality.ai",
+          "pinning_service": "Pinata",
+          "pinata_api_key": "encrypted_pinata_key",
+          "auto_pin": true
+        },
+        "health_status": "healthy",
+        "last_run_at": "2025-11-24T12:16:00Z",
+        "last_success_at": "2025-11-24T12:16:00Z",
+        "last_error_at": "2025-11-15T09:20:00Z",
+        "last_error_message": "Gateway timeout, retried successfully",
+        "run_count": 45892,
+        "success_count": 45878,
+        "failure_count": 14,
+        "created_at": "2025-01-20T10:00:00Z",
+        "updated_at": "2025-11-24T12:16:10Z",
+        "metadata": {
+          "total_storage_gb": 458.7,
+          "files_pinned": 12847,
+          "success_rate": 0.9996
+        }
+      },
+      {
+        "id": "888f9012-j56g-78h9-f012-971169629555",
+        "name": "Zcash Bridge RPC",
+        "integration_type": "blockchain",
+        "service_name": "Zcash",
+        "description": "RPC connection to Zcash node for cross-chain bridge operations",
+        "status": "enabled",
+        "configuration": {
+          "rpc_endpoint": "https://zcash-node.superreality.ai:8232",
+          "rpc_user": "encrypted_user",
+          "rpc_password": "encrypted_password",
+          "network": "mainnet",
+          "shielded_pool": "sapling"
+        },
+        "health_status": "healthy",
+        "last_run_at": "2025-11-24T12:15:30Z",
+        "last_success_at": "2025-11-24T12:15:30Z",
+        "last_error_at": null,
+        "last_error_message": null,
+        "run_count": 8947,
+        "success_count": 8947,
+        "failure_count": 0,
+        "created_at": "2025-02-01T08:00:00Z",
+        "updated_at": "2025-11-24T12:15:35Z",
+        "metadata": {
+          "node_version": "5.7.0",
+          "sync_status": "synced",
+          "block_height": 2384756,
+          "average_response_time_ms": 234
+        }
+      }
+    ],
+    
+    "integration_logs": [
+      {
+        "id": "aaa01234-l78i-90j1-h234-193381851777",
+        "integration_id": "666e7890-h34e-56f7-d890-759947407333",
+        "action": "api_call",
+        "status": "success",
+        "request_data": {
+          "method": "POST",
+          "endpoint": "/v1/post/",
+          "payload": {
+            "content": "Check out our new VR experience powered by blockchain! 🚀 #SuperReality #VR #Blockchain",
+            "media_url": "https://cdn.superreality.ai/promo-nov-2025.mp4",
+            "schedule_time": null
+          }
+        },
+        "response_data": {
+          "post_id": "7298765432109876543",
+          "status": "published",
+          "visibility": "public",
+          "created_at": "2025-11-24T11:45:00Z",
+          "share_url": "https://tiktok.com/@superrealityai/video/7298765432109876543"
+        },
+        "error_message": null,
+        "duration_ms": 1247,
+        "created_at": "2025-11-24T11:45:00Z",
+        "metadata": {
+          "user_agent": "SuperReality-Bot/1.0",
+          "ip_address": "203.0.113.42",
+          "retry_count": 0
+        }
+      }
+    ],
+    
+    "branding": [
+      {
+        "id": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        "name": "Super Reality Studios",
+        "description": "Leading blockchain-powered virtual reality platform creating immersive experiences across the metaverse",
+        "logo_url": "https://cdn.superreality.ai/branding/logo-primary.svg",
+        "logo_small_url": "https://cdn.superreality.ai/branding/logo-compact.svg",
+        "icon_url": "https://cdn.superreality.ai/branding/icon-512x512.png",
+        "primary_color": "#6C5CE7",
+        "secondary_color": "#A29BFE",
+        "accent_color": "#FD79A8",
+        "font_family": "Inter, system-ui, sans-serif",
+        "tagline": "Reality Reimagined",
+        "website_url": "https://superreality.ai",
+        "social_links": {
+          "twitter": "https://twitter.com/superrealityai",
+          "discord": "https://discord.gg/superreality",
+          "linkedin": "https://linkedin.com/company/super-reality",
+          "github": "https://github.com/super-reality",
+          "tiktok": "https://tiktok.com/@superrealityai"
+        },
+        "brand_guidelines_url": "https://brand.superreality.ai/guidelines.pdf",
+        "created_at": "2025-01-10T09:00:00Z",
+        "updated_at": "2025-11-20T14:30:00Z",
+        "metadata": {
+          "logo_variations": ["horizontal", "stacked", "icon-only"],
+          "approved_fonts": ["Inter", "Roboto Mono"],
+          "color_palette_extended": {
+            "neutral_dark": "#2D3436",
+            "neutral_light": "#DFE6E9",
+            "success": "#00B894",
+            "warning": "#FDCB6E",
+            "error": "#D63031"
+          }
+        }
+      }
+    ],
+    
+    "users": [
+      {
+        "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+        "username": "alice_blockchain",
+        "email": "alice@superreality.ai",
+        "full_name": "Alice Johnson",
+        "role": "developer",
+        "status": "active",
+        "avatar_url": "https://avatars.superreality.ai/alice.jpg",
+        "created_at": "2025-01-15T09:00:00Z",
+        "updated_at": "2025-11-24T08:30:00Z",
+        "last_login_at": "2025-11-24T08:30:00Z",
+        "metadata": {
+          "department": "Smart Contracts",
+          "expertise": ["Solidity", "Web3", "Security", "DeFi"],
+          "timezone": "America/Los_Angeles",
+          "github_username": "alice-blockchain",
+          "certifications": ["Certified Blockchain Developer", "Smart Contract Security Auditor"]
+        }
+      },
+      {
+        "id": "9c9e6679-7425-40de-944b-e07fc1f90ae9",
+        "username": "bob_admin",
+        "email": "bob@superreality.ai",
+        "full_name": "Bob Smith",
+        "role": "admin",
+        "status": "active",
+        "avatar_url": "https://avatars.superreality.ai/bob.jpg",
+        "created_at": "2025-01-10T09:00:00Z",
+        "updated_at": "2025-11-24T10:00:00Z",
+        "last_login_at": "2025-11-24T10:00:00Z",
+        "metadata": {
+          "department": "Engineering Leadership",
+          "expertise": ["System Architecture", "DevOps", "Team Management"],
+          "timezone": "America/New_York",
+          "github_username": "bob-superreality"
+        }
+      }
+    ],
+    
+    "activity_logs": [
+      {
+        "id": "bbb12345-m89j-01k2-i345-204492962888",
+        "entity_type": "task",
+        "entity_id": "123e4567-e89b-12d3-a456-426614174000",
+        "action": "updated",
+        "actor_id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+        "actor_type": "user",
+        "changes": {
+          "status": {
+            "before": "pending",
+            "after": "in_progress"
+          },
+          "actual_hours": {
+            "before": 0,
+            "after": 8.5
+          }
+        },
+        "created_at": "2025-11-24T12:00:00Z",
+        "metadata": {
+          "source": "web_interface",
+          "ip_address": "198.51.100.42",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        }
+      },
+      {
+        "id": "ccc23456-n90k-12l3-j456-315503073999",
+        "entity_type": "automation",
+        "entity_id": "444e5678-f12c-34d5-b678-537725285111",
+        "action": "executed",
+        "actor_id": null,
+        "actor_type": "automation",
+        "changes": {
+          "last_run_at": {
+            "before": "2025-11-11T02:00:00Z",
+            "after": "2025-11-18T02:00:15Z"
+          },
+          "run_count": {
+            "before": 86,
+            "after": 87
+          },
+          "success_count": {
+            "before": 83,
+            "after": 84
+          }
+        },
+        "created_at": "2025-11-18T02:05:30Z",
+        "metadata": {
+          "trigger": "schedule",
+          "duration_seconds": 313,
+          "result": "success"
+        }
+      }
+    ]
+  }
+}
