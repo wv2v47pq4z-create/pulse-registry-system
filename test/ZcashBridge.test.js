@@ -43,10 +43,12 @@ describe("ZcashBridge", function () {
         addr1.address,
         amount
       );
+      const receipt = await tx.wait();
+      const block = await ethers.provider.getBlock(receipt.blockNumber);
 
       await expect(tx)
         .to.emit(zcashBridge, "BridgeInitiated")
-        .withArgs(zcashTxHash, addr1.address, amount, await (await ethers.provider.getBlock('latest')).timestamp);
+        .withArgs(zcashTxHash, addr1.address, amount, block.timestamp);
     });
 
     it("Should reject zero address", async function () {
