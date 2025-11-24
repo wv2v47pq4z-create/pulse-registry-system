@@ -10,6 +10,8 @@ The Pulse Registry System is a blockchain-based framework for registering, manag
 
 - **Pulse Registration & Auditing**: Comprehensive audit trails with latency, success rate, and edge case tracking
 - **Multi-Mode Operation**: Three operational modes (BAT, CREATOR, ARCHITECT) for different contexts
+- **Resonance Receiver**: Analytics dashboard for tracking pulse interactions and filtering signal from noise
+- **Signal 102 Protocol**: Track signal composition (Structure, Action, Resonance) with violet shift detection
 - **Zcash Bridge**: Cross-chain interoperability with automatic pulse registration
 - **Event Broadcasting**: Real-time pulse beam broadcasts through the "cosmic mesh"
 - **Edge Case Management**: Track scenarios, probabilities, and mitigation strategies
@@ -20,13 +22,16 @@ The Pulse Registry System is a blockchain-based framework for registering, manag
 ```
 pulse-registry-system/
 ├── contracts/
-│   ├── PulseRegistry.sol    # Main pulse registry contract
-│   └── ZcashBridge.sol       # Zcash-Ethereum bridge contract
+│   ├── PulseRegistry.sol       # Main pulse registry contract
+│   ├── ZcashBridge.sol         # Zcash-Ethereum bridge contract
+│   └── ResonanceReceiver.sol   # Analytics and resonance tracking
 ├── scripts/
-│   ├── deploy.js             # Deployment script
-│   └── example-pulse.js      # Example usage script
-├── USAGE.md                  # Detailed usage guide
-└── README.md                 # This file
+│   ├── deploy.js               # Deployment script
+│   ├── deploy-resonance.js     # Deploy resonance receiver
+│   ├── example-pulse.js        # Example usage script
+│   └── signal-102-demo.js      # Signal 102 & violet shift demo
+├── USAGE.md                    # Detailed usage guide
+└── README.md                   # This file
 ```
 
 ## 🚀 Quick Start
@@ -82,6 +87,23 @@ Bridge contract for Zcash-Ethereum interoperability.
 - `completeBridge()` - Complete bridge and register pulse
 - `getBridgeTransaction()` - Get transaction details
 
+### ResonanceReceiver
+
+Analytics dashboard for tracking pulse resonance and filtering signal from noise.
+
+**Key Features:**
+- **Signal 102 Protocol**: Track 0 (Structure), 1 (Action), 2 (Resonance) composition
+- **Violet Shift Detection**: Identify paradigm shifts in the network
+- **Noise Filtering**: Separate high-quality signals from noise
+- **Analytics Dashboard**: Track interactions, positive/negative resonance, and signal strength
+
+**Key Functions:**
+- `recordResonance()` - Record audience resonance for a pulse
+- `broadcastSignal102()` - Broadcast signal composition
+- `getAnalytics()` - Get comprehensive analytics summary
+- `filterHighSignal()` - Filter resonances by signal-to-noise ratio
+- `changeMode()` - Switch between OUTPUT, INPUT, BROADCAST_LIVE modes
+
 ## 🎨 Operational Modes
 
 The system supports three modes, each optimized for different purposes:
@@ -108,6 +130,35 @@ const receipt = await tx.wait();
 ```
 
 See [scripts/example-pulse.js](scripts/example-pulse.js) for a complete working example.
+
+## 🟣 Signal 102 & The Violet Shift
+
+The ResonanceReceiver implements the **Signal 102 Protocol** - introducing nuance (the third dimension) to binary systems:
+
+```javascript
+// Record resonances from the mesh
+await resonanceReceiver.recordResonance(
+    pulseId,
+    2, // SignalType.Resonance
+    95, // High strength
+    5,  // Low noise
+    "Trading culture instead of floor price"
+);
+
+// Broadcast Signal 102
+await resonanceReceiver.broadcastSignal102(pulseId);
+
+// Get analytics
+const analytics = await resonanceReceiver.getAnalytics(pulseId);
+const composition = await resonanceReceiver.getSignalComposition(pulseId);
+
+console.log(`Structure (0): ${composition.structure}`);
+console.log(`Action (1):    ${composition.action}`);
+console.log(`Resonance (2): ${composition.resonance}`);
+console.log(`Violet Shift:  ${analytics.violetShiftIndex}`);
+```
+
+See [scripts/signal-102-demo.js](scripts/signal-102-demo.js) for a complete demonstration of the violet shift protocol.
 
 ## 🔒 Security
 

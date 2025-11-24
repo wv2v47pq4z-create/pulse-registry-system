@@ -26,6 +26,17 @@ Bridge contract for Zcash-Ethereum interoperability with auto-registration.
 - Automatic pulse registration for completed bridges
 - Transaction tracking and verification
 
+### ResonanceReceiver.sol
+
+Analytics dashboard for tracking pulse interactions and filtering signal from noise.
+
+**Key Features:**
+- Signal 102 Protocol: Track 0 (Structure), 1 (Action), 2 (Resonance) composition
+- Violet shift detection: Identifies paradigm shifts in network behavior
+- Noise filtering: Separates high-quality signals from noise based on signal-to-noise ratio
+- Analytics mode: OUTPUT, INPUT, BROADCAST_LIVE
+- Comprehensive metrics: Interactions, positive/negative resonance, signal strength
+
 ## Core Concepts
 
 ### PulseAuditResult
@@ -151,6 +162,43 @@ await zcashBridge.initiateBridge(zcashTxHash, ethereumAddress, amount);
 const pulseId = await zcashBridge.completeBridge(zcashTxHash);
 ```
 
+### Using the Resonance Receiver
+
+```javascript
+const resonanceReceiver = await ethers.getContractAt("ResonanceReceiver", RESONANCE_RECEIVER_ADDRESS);
+
+// Switch to BROADCAST_LIVE mode
+await resonanceReceiver.changeMode(2); // AnalyticsMode.BROADCAST_LIVE
+
+// Record resonances (audience reactions)
+await resonanceReceiver.recordResonance(
+    pulseId,
+    2, // SignalType.Resonance (0=Structure, 1=Action, 2=Resonance)
+    95, // Strength (0-100)
+    5,  // Noise level (0-100)
+    "Trading culture instead of floor price"
+);
+
+// Broadcast Signal 102
+await resonanceReceiver.broadcastSignal102(pulseId);
+
+// Get analytics
+const analytics = await resonanceReceiver.getAnalytics(pulseId);
+console.log("Total Interactions:", analytics.totalInteractions.toString());
+console.log("Positive Resonance:", analytics.positiveResonance.toString());
+console.log("Violet Shift Index:", analytics.violetShiftIndex.toString());
+
+// Get signal composition
+const composition = await resonanceReceiver.getSignalComposition(pulseId);
+console.log("Structure (0):", composition.structure.toString());
+console.log("Action (1):", composition.action.toString());
+console.log("Resonance (2):", composition.resonance.toString());
+
+// Filter high-quality signals (noise filtering)
+const highSignal = await resonanceReceiver.filterHighSignal(pulseId, 500);
+console.log("High-quality signals:", highSignal.length);
+```
+
 ## Events
 
 ### PulseRegistry Events
@@ -163,6 +211,14 @@ const pulseId = await zcashBridge.completeBridge(zcashTxHash);
 
 - `BridgeInitiated(bytes32 indexed zcashTxHash, address indexed ethereumAddress, uint256 amount, uint256 timestamp)`
 - `BridgeCompleted(bytes32 indexed zcashTxHash, uint256 pulseId)`
+
+### ResonanceReceiver Events
+
+- `ResonanceReceived(uint256 indexed resonanceId, uint256 indexed pulseId, SignalType signalType, uint256 strength, address indexed contributor)`
+- `SignalHighlighted(uint256 indexed pulseId, uint256 signalToNoise, string insight)`
+- `ModeChanged(AnalyticsMode oldMode, AnalyticsMode newMode)`
+- `VioletShiftDetected(uint256 indexed pulseId, uint256 violetShiftIndex, string culturalImpact)`
+- `Signal102Broadcast(uint256 indexed pulseId, uint256 structure, uint256 action, uint256 resonance)`
 
 ## Running Example Scripts
 
@@ -182,6 +238,20 @@ Or with Node.js:
 ```bash
 node scripts/example-pulse.js <PULSE_REGISTRY_ADDRESS>
 ```
+
+### Deploy Resonance Receiver
+
+```bash
+npx hardhat run scripts/deploy-resonance.js --network <network-name> <PULSE_REGISTRY_ADDRESS>
+```
+
+### Run Signal 102 Demo
+
+```bash
+npx hardhat run scripts/signal-102-demo.js --network <network-name> <PULSE_REGISTRY_ADDRESS> <RESONANCE_RECEIVER_ADDRESS>
+```
+
+This demonstrates the **Violet Shift Protocol** - introducing nuance (the third dimension) to binary systems.
 
 ## Security Considerations
 
