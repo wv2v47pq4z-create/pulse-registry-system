@@ -66,10 +66,24 @@ This document provides:
 
 ---
 
-### 🤖 [PERPLEXITY_MASTER_PROMPT.md](./PERPLEXITY_MASTER_PROMPT.md)
-**Comprehensive system documentation for AI ingestion and understanding**
+### 🤖 [PERPLEXITY_AI_MASTER_PROMPT.md](./PERPLEXITY_AI_MASTER_PROMPT.md) ⭐ NEW
+**Optimized master prompt specifically for Perplexity AI ingestion**
 
-This document serves as a complete knowledge base:
+This streamlined document consolidates all system knowledge into a single AI-optimized format:
+- Complete 3-layer architecture (blockchain + database + integrations)
+- Condensed data structures with inline examples
+- All key workflows in one place
+- Quick reference sections for fast lookup
+- Optimized for AI parsing and understanding
+
+**Use this document**: When training Perplexity AI or other AI systems that need complete context in a single, streamlined format.
+
+---
+
+### 📖 [PERPLEXITY_MASTER_PROMPT.md](./PERPLEXITY_MASTER_PROMPT.md)
+**Comprehensive detailed system documentation (original version)**
+
+This detailed document serves as a complete knowledge base:
 - System identity and context
 - Technical architecture with diagrams
 - Complete data models with code examples
@@ -123,11 +137,16 @@ This document serves as a complete knowledge base:
 4. Review Data Flow and State Transitions
 
 ### For AI Systems (Perplexity, ChatGPT, Claude, etc.)
+**Primary Option (Recommended)**: 
+1. Ingest [PERPLEXITY_AI_MASTER_PROMPT.md](./PERPLEXITY_AI_MASTER_PROMPT.md) - Single consolidated prompt with all system context
+
+**Detailed Option (For Deep Dive)**:
 1. Ingest [PERPLEXITY_MASTER_PROMPT.md](./PERPLEXITY_MASTER_PROMPT.md) completely
 2. Reference [ACCOUNT_DATA_AUDIT.md](./ACCOUNT_DATA_AUDIT.md) for blockchain data specifications
 3. Review [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) for project and automation data models
 4. Use [database_examples.json](./database_examples.json) for concrete JSON examples
-5. Use all documents to answer questions about:
+
+**Use either approach to answer questions about:**
    - System architecture and design
    - Smart contract and blockchain implementation
    - Database design and data models
@@ -196,11 +215,12 @@ This document serves as a complete knowledge base:
 
 | Document | Version | Last Updated | Status |
 |----------|---------|--------------|--------|
+| PERPLEXITY_AI_MASTER_PROMPT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | DATABASE_SCHEMA.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | database_examples.json | 1.0.0 | 2025-11-24 | ✅ Complete |
 | ACCOUNT_DATA_AUDIT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
 | PERPLEXITY_MASTER_PROMPT.md | 1.0.0 | 2025-11-24 | ✅ Complete |
-| DOCUMENTATION_INDEX.md | 1.1.0 | 2025-11-24 | ✅ Complete |
+| DOCUMENTATION_INDEX.md | 1.2.0 | 2025-11-24 | ✅ Complete |
 
 ---
 
