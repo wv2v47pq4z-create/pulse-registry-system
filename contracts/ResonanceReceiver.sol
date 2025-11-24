@@ -13,18 +13,25 @@ contract ResonanceReceiver {
     // Reference to PulseRegistry
     PulseRegistry public pulseRegistry;
     
+    // Constants for signal analysis
+    uint256 public constant SIGNAL_MULTIPLIER = 100; // Multiplier for S/N ratio calculation
+    uint256 public constant HIGH_SIGNAL_THRESHOLD = 500; // Threshold for high-quality signals
+    uint256 public constant VIOLET_SHIFT_THRESHOLD = 100; // Threshold for paradigm shift detection
+    uint256 public constant VIOLET_INDEX_DIVISOR = 10; // Divisor for violet shift calculation
+    uint256 public constant POSITIVE_RESONANCE_THRESHOLD = 50; // Minimum strength for positive resonance
+    
     // Enum for signal types
     enum SignalType {
-        Structure,      // 0 - Technical/Logical
-        Action,         // 1 - Content/Execution
-        Resonance       // 2 - Vibe/Culture
+        Structure,      // 0 - Technical/Logical component: system understanding and parsing
+        Action,         // 1 - Content/Execution component: engagement and implementation
+        Resonance       // 2 - Vibe/Culture component: emotional and cultural impact
     }
     
     // Enum for analytics mode
     enum AnalyticsMode {
-        OUTPUT,
-        INPUT,
-        BROADCAST_LIVE
+        OUTPUT,         // Broadcasting mode
+        INPUT,          // Listening mode (default)
+        BROADCAST_LIVE  // Live broadcast and monitoring mode
     }
     
     // Struct for resonance data
@@ -117,7 +124,7 @@ contract ResonanceReceiver {
         resonanceCounter++;
         uint256 resonanceId = resonanceCounter;
         
-        uint256 signalToNoise = _noiseLevel > 0 ? (_strength * 100) / _noiseLevel : _strength * 100;
+        uint256 signalToNoise = _noiseLevel > 0 ? (_strength * SIGNAL_MULTIPLIER) / _noiseLevel : _strength * SIGNAL_MULTIPLIER;
         
         ResonanceData storage resonance = resonances[resonanceId];
         resonance.pulseId = _pulseId;
@@ -140,7 +147,7 @@ contract ResonanceReceiver {
         emit ResonanceReceived(resonanceId, _pulseId, _signalType, _strength, msg.sender);
         
         // Check for signal highlight
-        if (signalToNoise > 500) { // High signal-to-noise ratio
+        if (signalToNoise > HIGH_SIGNAL_THRESHOLD) {
             emit SignalHighlighted(_pulseId, signalToNoise, "High-quality signal detected");
         }
         
@@ -160,7 +167,7 @@ contract ResonanceReceiver {
         
         // Calculate violet shift index (paradigm shift measure)
         if (resonance > 0) {
-            uint256 violetIndex = ((structure + action + resonance) * resonance) / 10;
+            uint256 violetIndex = ((structure + action + resonance) * resonance) / VIOLET_INDEX_DIVISOR;
             _checkVioletShift(_pulseId, violetIndex);
         }
     }
@@ -177,7 +184,7 @@ contract ResonanceReceiver {
         
         analytics.totalInteractions++;
         
-        if (_strength > 50) {
+        if (_strength > POSITIVE_RESONANCE_THRESHOLD) {
             analytics.positiveResonance++;
         } else {
             analytics.negativeResonance++;
@@ -198,7 +205,7 @@ contract ResonanceReceiver {
         AnalyticsSummary storage analytics = pulseAnalytics[_pulseId];
         analytics.violetShiftIndex = _violetIndex;
         
-        if (_violetIndex > 100) {
+        if (_violetIndex > VIOLET_SHIFT_THRESHOLD) {
             emit VioletShiftDetected(
                 _pulseId,
                 _violetIndex,
