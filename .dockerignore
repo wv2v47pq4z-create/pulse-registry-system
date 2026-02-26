@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Hardhat compiler artifacts and cache
+artifacts/
+cache/
+*.dbg.json
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+
+# Git metadata
+.git/
+
+# CI configuration (not needed in image)
+.github/

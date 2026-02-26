@@ -1,0 +1,19 @@
+{
+  "name": "pulse-registry-system",
+  "version": "1.0.0",
+  "description": "Smart contracts for PulseRegistry and ZcashBridge – auto-registration and interoperability layer for Super Reality Studios blockchain ecosystem.",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "coverage": "hardhat coverage",
+    "clean": "hardhat clean",
+    "node": "hardhat node"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

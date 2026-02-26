@@ -6,6 +6,12 @@
 deps/
 states/
 
+# Hardhat cache
+cache/
+
+# Node.js dependencies
+node_modules/
+
 # Debug info
 *.dbg.json
 *.tsbuildinfo

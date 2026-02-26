@@ -1,0 +1,32 @@
+services:
+  # Local Hardhat node – JSON-RPC available at http://localhost:8545
+  node:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app/contracts
+      - ./scripts:/app/scripts
+      - ./test:/app/test
+
+  # One-shot compile service
+  compile:
+    build:
+      context: .
+      target: builder
+    command: npm run compile
+    volumes:
+      - ./contracts:/app/contracts
+      - ./artifacts:/app/artifacts
+
+  # One-shot test service
+  test:
+    build:
+      context: .
+      target: builder
+    command: npm test
+    volumes:
+      - ./contracts:/app/contracts
+      - ./test:/app/test
