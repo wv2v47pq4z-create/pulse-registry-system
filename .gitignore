@@ -19,3 +19,7 @@ node_modules/
 # Optional
 .env
 .env.local
+
+# System files
+*.log
+.DS_Store
