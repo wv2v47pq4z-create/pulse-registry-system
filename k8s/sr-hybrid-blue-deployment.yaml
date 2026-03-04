@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sr-hybrid-blue
+  namespace: sr-hybrid
+  labels:
+    app: sr-hybrid
+    version: blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sr-hybrid
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: sr-hybrid
+        version: blue
+    spec:
+      containers:
+      - name: sr-hybrid
+        image: placeholder-image:latest  # This will be updated by the deployment workflow
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: DEPLOYMENT_COLOR
+          value: "blue"
+        - name: PORT
+          value: "8080"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: storage
+          mountPath: /data
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: sr-hybrid-storage
